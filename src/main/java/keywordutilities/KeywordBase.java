@@ -19,8 +19,10 @@ public class KeywordBase {
 	Parameters parameters;
 	public static Properties OR;
 	private static Logger log = Logger.getLogger(KeywordBase.class);
+	public static RemoteWebDriver d;
 
-	KeywordBase() {
+	KeywordBase(RemoteWebDriver d) {
+		KeywordBase.d = d;
 		parameters = new Parameters();
 	}
 
@@ -52,7 +54,7 @@ public class KeywordBase {
 		} else if (locType.equals("LINKTEXT")) {
 			by = By.linkText(locValue);
 		}
-		log.info("for :"+locType+" value :"+locValue);
+		log.info("for :" + locType + " value :" + locValue);
 		return by;
 	}
 
@@ -61,13 +63,13 @@ public class KeywordBase {
 		String loc = OR.getProperty(locator);
 		WebElement element = null;
 		By by = getBy(loc);
-		element = WebdriverManager.getDriverInstance().findElement(by);
+		element =d.findElement(by);
 		return element;
 	}
 
 	public static void startDriver(String browser) {
 		WebdriverManager.setupDriver(browser);
-	 WebdriverManager.getDriverInstance();
+		WebdriverManager.getDriverInstance();
 	}
 
 	public static void click(String s) {
@@ -103,12 +105,13 @@ public class KeywordBase {
 	}
 
 	public static void stopDriver() {
-	WebdriverManager.stopDriver();
+		WebdriverManager.stopDriver();
 	}
-	
+
 	public static void main(String[] args) throws IOException {
 		startDriver("firefox");
 		type("searchBox", "hehe");
+		stopDriver();
 	}
 
 }

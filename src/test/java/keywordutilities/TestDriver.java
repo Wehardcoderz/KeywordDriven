@@ -9,26 +9,33 @@ import java.util.Map.Entry;
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import common.ReadExcelData;
+import common.WebdriverManager;
 
 public class TestDriver {
 	private static Logger log = Logger.getLogger(TestDriver.class);
 	ReadExcelData excelData;
 	HashMap<Integer, ArrayList<String>> keyset;
-	static KeywordBase keyWord;
+	static KeywordBase keyWordBase;
 	public static String keyword;
 	public static String target;
 	public static String value;
 	public static Method methods[];
+	RemoteWebDriver d;
 
-	public TestDriver() {
+	@BeforeMethod
+	public void setUp() {
 		excelData = new ReadExcelData("TestCase.xls");
 		keyset = new HashMap<Integer, ArrayList<String>>();
 		keyset = excelData.getAllValues("LoginTest");
-		keyWord = new KeywordBase();
-		methods = keyWord.getClass().getMethods();
+		WebdriverManager.startDriver();
+		d = WebdriverManager.getDriverInstance();
+		keyWordBase = new KeywordBase(d);
+		methods = keyWordBase.getClass().getMethods();
 	}
 
 	@Test
@@ -61,31 +68,21 @@ public class TestDriver {
 				if (methods[i].getName().equals(keyword)) {
 					// In case of match found, it will execute the matched
 					// method
-					if (target == null) {
-						if (value != null) {
-							methods[i].invoke(keyWord, value);
-							break;
-						}
-					} else if (value == null && target != null) {
-						methods[i].invoke(keyWord, target);
-						break;
-					}
-					else if (value != null && target != null) {
-						methods[i].invoke(keyWord, target, value);
-						break;
-					}
-					else if (value == null && target == null) {
-						methods[i].invoke(keyWord);
-						break;
-					}
-					else {
+					if (target != null && value != null) {
+							methods[i].invoke(keyWordBase, target, value);
+					} else if (target != null && value ==null) {
+						methods[i].invoke(keyWordBase,target);
+					} else if (target == null && value != null) {
+						methods[i].invoke(keyWordBase, value);
+					} else if (value == null && target == null) {
+						methods[i].invoke(keyWordBase);
+					} else {
 						Assert.fail("Empty target and values");
-						break;
 					}
 					// Once any method is executed, this break statement will
 					// take
 					// the flow outside of for loop
-					
+
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

@@ -10,9 +10,9 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 public class WebdriverManager {
 	public static ThreadLocal<RemoteWebDriver> driverThread = new ThreadLocal<RemoteWebDriver>();
-	public static String browserType;
+	public static String browserType = "firefox";
 
-	public static RemoteWebDriver getDriverInstance() {
+	public static void startDriver() {
 		RemoteWebDriver d = driverThread.get();
 		if (d == null) {
 			if (browserType.contains("firefox")) {
@@ -29,7 +29,11 @@ public class WebdriverManager {
 		d.manage().window().maximize();
 		d.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 		}
-		return d;
+		driverThread.set(d);
+	}
+	
+	public static RemoteWebDriver getDriverInstance() {
+		return driverThread.get();
 	}
 	
 	public static void setupDriver(String browser){
@@ -37,8 +41,9 @@ public class WebdriverManager {
 		}	
 
 	public static void stopDriver() {
-		WebdriverManager.getDriverInstance().close();
+		if(!(WebdriverManager.getDriverInstance()==null)) {
 		WebdriverManager.getDriverInstance().quit();
 		 driverThread.set(null);
+		}
 	}
 }
