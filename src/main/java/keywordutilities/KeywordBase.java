@@ -3,6 +3,7 @@ package keywordutilities;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -15,7 +16,7 @@ import common.Constants;
 import common.Parameters;
 import common.WebdriverManager;
 
-public class KeywordBase {
+public class KeywordBase implements Constants{
 	Parameters parameters;
 	public static Properties OR;
 	private static Logger log = Logger.getLogger(KeywordBase.class);
@@ -27,7 +28,7 @@ public class KeywordBase {
 	}
 
 	public static void initOR() {
-		String file = new File(Constants.OBJECT_REPOSITORY_PATH)
+		String file = new File(OBJECT_REPOSITORY_PATH)
 				.getAbsolutePath();
 		try (FileInputStream fis = new FileInputStream(file)) {
 			OR = new Properties();

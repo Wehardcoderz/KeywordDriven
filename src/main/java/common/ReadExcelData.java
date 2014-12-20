@@ -19,8 +19,10 @@ public class ReadExcelData {
 	HSSFSheet sheet;
 	Row row;
 	Cell cell;
+	public String sheetName;
 
-	public ReadExcelData(String path) {
+	public ReadExcelData(String path, String sheetName) {
+		this.sheetName = sheetName;
 		try {
 			fileInputStream = new FileInputStream(path);
 			workbook = new HSSFWorkbook(fileInputStream);
@@ -29,7 +31,7 @@ public class ReadExcelData {
 		}
 	}
 
-	public HashMap<Integer, ArrayList<String>> getAllValues(String sheetName) {
+	public HashMap<Integer, ArrayList<String>> getAllValues() {
 		HashMap<Integer, ArrayList<String>> readValue = new HashMap<Integer, ArrayList<String>>();
 		ArrayList<String> data = new ArrayList<String>();
 		try {
@@ -108,7 +110,7 @@ public class ReadExcelData {
 		return readValue;
 	}
 
-	public String getCellValue(String sheetName, int index, String heading) {
+	public String getCellValue(int index, String heading) {
 		String cellValue = "";
 		try {
 			sheet = workbook.getSheet(sheetName);
@@ -141,15 +143,15 @@ public class ReadExcelData {
 	}
 
 	public static void main(String[] args) throws IOException {
-		ReadExcelData read = new ReadExcelData("TestCase.xls");
+		ReadExcelData read = new ReadExcelData("TestCase.xls","");
 		HashMap<Integer, ArrayList<String>> keyset = new HashMap<Integer, ArrayList<String>>();
-		keyset = read.getAllValues("LoginTest");
+		keyset = read.getAllValues();
 		Set<Entry<Integer, ArrayList<String>>> set = keyset.entrySet();
 
 		for (Entry<Integer, ArrayList<String>> me : set)
 			System.out.println(me.getKey() + " " + me.getValue());
 
-		System.out.println(read.getCellValue("LoginTest", 1, "Command"));
+		System.out.println(read.getCellValue( 1, "Command"));
 	}
 
 }

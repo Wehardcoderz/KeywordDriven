@@ -1,0 +1,12 @@
+2014-Dec-20 10:35:04,852  INFO NewTest:39 - setup for TestCase4
+2014-Dec-20 10:35:04,869  INFO NewTest:45 - teardown for TestCase4
+2014-Dec-20 10:35:04,870  INFO NewTest:39 - setup for TestCase6
+2014-Dec-20 10:35:04,872  INFO NewTest:45 - teardown for TestCase6
+2014-Dec-20 10:35:04,872  INFO NewTest:39 - setup for TestCase5
+2014-Dec-20 10:35:04,874  INFO NewTest:45 - teardown for TestCase5
+2014-Dec-20 10:35:04,874  INFO NewTest:39 - setup for TestCase3
+2014-Dec-20 10:35:04,876  INFO NewTest:45 - teardown for TestCase3
+2014-Dec-20 10:35:04,877  INFO NewTest:39 - setup for TestCase1
+2014-Dec-20 10:35:04,881  INFO NewTest:45 - teardown for TestCase1
+2014-Dec-20 10:35:04,881  INFO NewTest:39 - setup for TestCase2
+2014-Dec-20 10:35:04,883  INFO NewTest:45 - teardown for TestCase2

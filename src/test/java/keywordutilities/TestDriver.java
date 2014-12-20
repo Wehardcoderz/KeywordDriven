@@ -3,6 +3,7 @@ package keywordutilities;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.Map.Entry;
 
@@ -11,6 +12,7 @@ import junit.framework.Assert;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import common.ReadExcelData;
@@ -18,20 +20,28 @@ import common.WebdriverManager;
 
 public class TestDriver {
 	private static Logger log = Logger.getLogger(TestDriver.class);
-	ReadExcelData excelData;
-	HashMap<Integer, ArrayList<String>> keyset;
-	static KeywordBase keyWordBase;
+	LinkedList<String> testName = new LinkedList<String>();
+	LinkedList<String> testDescription = new LinkedList<String>();
+	LinkedList<String> testEnabled = new LinkedList<String>();
 	public static String keyword;
 	public static String target;
 	public static String value;
+	ReadExcelData excelData;
+	HashMap<Integer, ArrayList<String>> keyset;
+	static KeywordBase keyWordBase;
 	public static Method methods[];
 	RemoteWebDriver d;
 
+	@BeforeSuite
+	public void prepareData() {
+		
+	}
+	
 	@BeforeMethod
-	public void setUp() {
-		excelData = new ReadExcelData("TestCase.xls");
+	public void setUp(String sheetName) {
+		excelData = new ReadExcelData(sheetName, "TestCase.xls");
 		keyset = new HashMap<Integer, ArrayList<String>>();
-		keyset = excelData.getAllValues("LoginTest");
+		keyset = excelData.getAllValues();
 		WebdriverManager.startDriver();
 		d = WebdriverManager.getDriverInstance();
 		keyWordBase = new KeywordBase(d);
@@ -48,10 +58,9 @@ public class TestDriver {
 			keyword = null;
 			target = null;
 			value = null;
-			keyword = excelData.getCellValue("LoginTest", me.getKey(),
-					"Command");
-			target = excelData.getCellValue("LoginTest", me.getKey(), "Target");
-			value = excelData.getCellValue("LoginTest", me.getKey(), "Value");
+			keyword = excelData.getCellValue(me.getKey(), "Command");
+			target = excelData.getCellValue(me.getKey(), "Target");
+			value = excelData.getCellValue(me.getKey(), "Value");
 			execute();
 		}
 	}
@@ -69,9 +78,9 @@ public class TestDriver {
 					// In case of match found, it will execute the matched
 					// method
 					if (target != null && value != null) {
-							methods[i].invoke(keyWordBase, target, value);
-					} else if (target != null && value ==null) {
-						methods[i].invoke(keyWordBase,target);
+						methods[i].invoke(keyWordBase, target, value);
+					} else if (target != null && value == null) {
+						methods[i].invoke(keyWordBase, target);
 					} else if (target == null && value != null) {
 						methods[i].invoke(keyWordBase, value);
 					} else if (value == null && target == null) {

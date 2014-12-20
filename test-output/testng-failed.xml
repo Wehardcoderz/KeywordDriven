@@ -3,11 +3,14 @@
 <suite name="Failed suite [Default suite]">
   <test name="Default test(failed)">
     <classes>
-      <class name="keywordutilities.TestDriver">
+      <class name="keywordutilities.NewTest">
         <methods>
-          <include name="test"/>
+          <include name="f"/>
+          <include name="f"/>
+          <include name="tearDown"/>
+          <include name="setUp"/>
         </methods>
-      </class> <!-- keywordutilities.TestDriver -->
+      </class> <!-- keywordutilities.NewTest -->
     </classes>
   </test> <!-- Default test(failed) -->
 </suite> <!-- Failed suite [Default suite] -->

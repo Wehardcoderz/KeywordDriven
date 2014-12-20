@@ -23,5 +23,15 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.testng.TESTNG_CONTAINER"/>
+	<classpathentry kind="lib" path="C:/Users/vish/.m2/repository/org/rendersnake/rendersnake/1.8/rendersnake-1.8.jar" sourcepath="C:/Users/vish/.m2/repository/org/rendersnake/rendersnake/1.8/rendersnake-1.8-sources.jar">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="javadoc_location" value="jar:file:/C:/Users/vish/.m2/repository/org/rendersnake/rendersnake/1.8/rendersnake-1.8-javadoc.jar!/"/>
+			<attribute name="maven.groupId" value="org.rendersnake"/>
+			<attribute name="maven.artifactId" value="rendersnake"/>
+			<attribute name="maven.version" value="1.8"/>
+			<attribute name="maven.scope" value="compile"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
