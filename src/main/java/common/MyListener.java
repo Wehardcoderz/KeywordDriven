@@ -1,27 +1,30 @@
 package common;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 import org.testng.ITestContext;
 import org.testng.ITestResult;
-import org.testng.Reporter;
 import org.testng.TestListenerAdapter;
-import org.testng.internal.TestResult;
 
 public class MyListener extends TestListenerAdapter {
 	LinkedHashMap<String, String> testPassed;
-	LinkedHashMap<String, String> testFailed;
-	LinkedHashMap<String, String> testSkipped;
+	LinkedHashMap<String,Object[]> testFailed;
+	LinkedHashMap<String,Object[]> testSkipped;
+	LinkedHashMap<String, String> testLogs;
 	private ITestContext testContext = null;
-	String[] s;
+	String t = null;
 
 	@Override
 	public void onStart(ITestContext context) {
 		testContext = context;
-		testPassed = new LinkedHashMap<>();
-		testFailed = new LinkedHashMap<>();
-		testSkipped = new LinkedHashMap<>();
+		testPassed = new LinkedHashMap<String, String>();
+		testFailed = new LinkedHashMap<String, Object[]>();
+		testSkipped = new LinkedHashMap<String, Object[]>();
+		testLogs = new LinkedHashMap<String, String>();
 	}
 
 	@Override
@@ -31,33 +34,46 @@ public class MyListener extends TestListenerAdapter {
 		try {
 			reporter.startReport();
 			reporter.writeExecutionSummary(testContext);
-			reporter.writeExecutionDetail(testPassed, testFailed, testSkipped);
+			reporter.writeExecutionDetail(testPassed, testFailed, testSkipped,testLogs);
 			reporter.finishReport();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-System.out.println(CheckStatic.getAdded());
 	}
 
 	@Override
 	public void onTestFailure(ITestResult tr) {
-		s = tr.getTestName().split(" ");
-		testFailed.put(s[0], s[1]);
+		for(Map.Entry<String, String> entry: MyTestContext.getTestStats().entrySet()){
+		testFailed.put(entry.getKey(),new Object[]{entry.getValue(),tr.getThrowable()});
+		t = entry.getKey();
+		}
+		addTestLogs(t);
+		MyTestContext.testStats.remove();
 	}
 
 	@Override
 	public void onTestSkipped(ITestResult tr) {
-		s = tr.getTestName().split(" ");
-		testSkipped.put(s[0], s[1]);
-	}
+		for(Map.Entry<String, String> entry: MyTestContext.getTestStats().entrySet()) {
+		testSkipped.put(entry.getKey(),new Object[]{entry.getValue(),tr.getThrowable()});
+		t=entry.getKey();
+		}
+		addTestLogs(t);
+		MyTestContext.testStats.remove();}
 
 	@Override
 	public void onTestSuccess(ITestResult tr) {
-		s = tr.getTestName().split(" ");
-		testPassed.put(s[0], s[1]);
-		for(String s : Reporter.getOutput(tr))
-			System.out.println(s);
+		for(Map.Entry<String, String> entry: MyTestContext.getTestStats().entrySet()) {
+			testPassed.put(entry.getKey(), entry.getValue());
+			t=entry.getKey();
+		}
+		addTestLogs(t);
+		MyTestContext.testStats.remove();
+	}
+	
+	public void addTestLogs(String s) {
+		testLogs.put(s, MyTestContext.getMessages());
+		MyTestContext.messages.remove();
 	}
 
 //	@Override

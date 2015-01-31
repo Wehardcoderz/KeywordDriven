@@ -66,47 +66,74 @@ public class CustomReport implements Constants {
 		int skipped = testContext.getSkippedTests().size();
 		int failed = testContext.getFailedTests().size();
 		int total = passed + skipped + failed;
-		html.tr(class_("tableHeader")).td().a(href("#Detail")).write(REPORT_TITLE)._a()._td().td()
-				.write(total)._td().td(class_("passed number")).write(passed)
-				._td().td(class_("skipped number")).write(skipped)._td()
+		html.tr(class_("tableHeader")).td().a(href("#Detail"))
+				.write(REPORT_TITLE)._a()._td().td().write(total)._td()
+				.td(class_("passed number")).write(passed)._td()
+				.td(class_("skipped number")).write(skipped)._td()
 				.td(class_("failed number")).write(failed)._td();
 		html.td().write(passedPercentage(passed, total))._td()._tr()._tbody()
 				._table()._div();
 	}
 
 	public void writeExecutionDetail(LinkedHashMap<String, String> testPassed,
-			LinkedHashMap<String, String> testFailed,
-			LinkedHashMap<String, String> testSkipped) throws IOException {
+			LinkedHashMap<String, Object[]> testFailed,
+			LinkedHashMap<String, Object[]> testSkipped,LinkedHashMap<String,String> testLogs) throws IOException {
 		int count = 1;
 		LinkedHashMap<String, String> passed = testPassed;
-		LinkedHashMap<String, String> failed = testFailed;
-		LinkedHashMap<String, String> skipped = testSkipped;
+		LinkedHashMap<String,Object[]> failed = testFailed;
+		LinkedHashMap<String, Object[]> skipped = testSkipped;
 		html.div(class_("summary")).h2().write("Execution Detail")._h2();
 		html.table(border("1")).tbody().tr(class_("tableHeader")).th()
-				.a(name("Detail")).write("#")._a()._th().th().write("Test Name")._th().th()
-				.write("Description")._th().th().write("Result")._th()._tr();
+				.a(name("Detail")).write("#")._a()._th().th()
+				.write("Test Name")._th().th().write("Description")._th().th()
+				.write("Result")._th()._tr();
 		for (Map.Entry<String, String> entry : passed.entrySet()) {
-			html.tr(class_("passed number")).td().write(count++)._td().td(class_("methodn"))
-					.write(entry.getKey())._td().td().write(entry.getValue())
-					._td().td().write("Expected valu failed")._td()._tr();
+			html.tr(class_("passed number")).td().write(count++)._td()
+					.td(class_("methodn")).a(href("#"+entry.getKey())).write(entry.getKey())._a()._td().td()
+					.write(entry.getValue())._td().td()
+					.write("Passed")._td()._tr();
 		}
-		for (Map.Entry<String, String> entry : skipped.entrySet()) {
-			html.tr(class_("skipped number")).td().write(count++)._td().td(class_("methodn"))
-					.write(entry.getKey())._td().td().write(entry.getValue())
-					._td().td().write("Expected valu failed")._td()._tr();
+		Set<String> keyset_s = skipped.keySet();
+		for (String key : keyset_s) {
+			Object[] o = failed.get(key);
+			html.tr(class_("skipped number")).td().write(count++)._td()
+					.td(class_("methodn")).a(href("#"+key)).write(key)._a()._td().td()
+					.write(o[0].toString())._td().td()
+					.write(o[1].toString())._td()._tr();
 		}
-		for (Map.Entry<String, String> entry : failed.entrySet()) {
-			html.tr(class_("failed number")).td().write(count++)._td().td(class_("methodn"))
-					.write(entry.getKey())._td().td().write(entry.getValue())
-					._td().td().write("Expected valu failed")._td()._tr();
+		 Set<String> keyset_f = failed.keySet();
+		for (String key : keyset_f) {
+			Object[] o = failed.get(key);
+			html.tr(class_("failed number")).td().write(count++)._td()
+					.td(class_("methodn")).a(href("#"+key)).write(key)._a()._td().td()
+					.write(o[0].toString())._td().td()
+					.write(o[1].toString())._td()._tr();
 		}
 
 		html._tbody()._table()._div();
+		messageCollector(testLogs);
 		html._body()._html();
+	}
+	
+	public void messageCollector(LinkedHashMap<String,String> testLogs) throws IOException {
+		LinkedHashMap<String, String> messages = testLogs;
+		html.div(class_("summary")).h2().write("Test Logs")._h2();
+		Set<java.util.Map.Entry<String,String>> keyset = messages.entrySet();
+		for(java.util.Map.Entry<String, String> key : keyset){
+			html.table(border("1")).tbody().tr(class_("tableHeader")).th().a(name(key.getKey())).write(key.getKey())._a()._th()._tr().tr().td().write(key.getValue())._td();
+			html._tr()._tbody()._table();	
+		}
+		html._div();
 	}
 
 	public String passedPercentage(Integer passed, Integer total) {
-		return Float.toString((float) (passed * 100 / total));
+		String s = null;
+		try {
+			s = Float.toString((float) (passed * 100 / total));
+		} catch (Exception e) {
+			s = e.toString();
+		}
+		return s;
 	}
 
 	public void writeStyleSheet() throws IOException {

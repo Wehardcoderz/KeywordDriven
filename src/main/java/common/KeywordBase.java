@@ -1,9 +1,8 @@
-package keywordutilities;
+package common;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -22,7 +21,7 @@ public class KeywordBase implements Constants{
 	private static Logger log = Logger.getLogger(KeywordBase.class);
 	public static RemoteWebDriver d;
 
-	KeywordBase(RemoteWebDriver d) {
+	 public KeywordBase(RemoteWebDriver d) {
 		KeywordBase.d = d;
 		parameters = new Parameters();
 	}
@@ -30,11 +29,11 @@ public class KeywordBase implements Constants{
 	public static void initOR() {
 		String file = new File(OBJECT_REPOSITORY_PATH)
 				.getAbsolutePath();
-		try (FileInputStream fis = new FileInputStream(file)) {
+		try {
+			FileInputStream fis = new FileInputStream(file);
 			OR = new Properties();
 			OR.load(fis);
 		} catch (IOException e1) {
-			System.out.println(e1.getMessage());
 			log.error("Error in initilizing the OR.properties file", e1);
 		}
 	}
@@ -55,7 +54,7 @@ public class KeywordBase implements Constants{
 		} else if (locType.equals("LINKTEXT")) {
 			by = By.linkText(locValue);
 		}
-		log.info("for :" + locType + " value :" + locValue);
+		log.info("Fetching element for :" + locType + " value :" + locValue);
 		return by;
 	}
 
@@ -70,14 +69,17 @@ public class KeywordBase implements Constants{
 
 	public static void startDriver(String browser) {
 		WebdriverManager.setupDriver(browser);
+		log.info("Starting browser : "+browser);
 		WebdriverManager.getDriverInstance();
 	}
 
 	public static void click(String s) {
+		log.info("Clicking on "+s);
 		getElement(s).click();
 	}
 
 	public static void type(String locator, String val) {
+		log.info("Typing "+val);
 		WebElement e = getElement(locator);
 		e.clear();
 		e.sendKeys(val);
@@ -88,18 +90,21 @@ public class KeywordBase implements Constants{
 	}
 
 	public static void selectIndex(String locator, int i) {
+		log.info("Select by index "+locator);
 		WebElement e = getElement(locator);
 		Select select = new Select(e);
 		select.selectByIndex(i);
 	}
 
 	public static void selectValue(String locator, String value) {
+		log.info("Select by value "+locator+" value "+value);
 		WebElement e = getElement(locator);
 		Select select = new Select(e);
 		select.selectByValue(value);
 	}
 
 	public static void selectText(String locator, String value) {
+		log.info("Select by text "+locator+" value "+value);
 		WebElement e = getElement(locator);
 		Select select = new Select(e);
 		select.selectByVisibleText(value);

@@ -11,4 +11,5 @@ public static final String TEST_XLSPATH = "TestCase.xls";
 public static final String TEST_SUITENAME = "SampleSuite";
 public static final String TEST_SUITESHEET = "TestSuite";
 public static final String REPORT_TITLE = "Some sample test";
+public static final Integer THREAD_COUNT = 2;
 }

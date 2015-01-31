@@ -8,12 +8,17 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import keywordutilities.TestSuiteDriver;
+
+import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.testng.Assert;
 
 public class ReadExcelData {
+	private static Logger log = Logger.getLogger(ReadExcelData.class);
 	FileInputStream fileInputStream = null;
 	HSSFWorkbook workbook;
 	HSSFSheet sheet;
@@ -21,7 +26,9 @@ public class ReadExcelData {
 	Cell cell;
 	public String sheetName;
 
+
 	public ReadExcelData(String path, String sheetName) {
+		log.info("started");
 		this.sheetName = sheetName;
 		try {
 			fileInputStream = new FileInputStream(path);
@@ -29,6 +36,16 @@ public class ReadExcelData {
 		} catch (IOException e) {
 			System.out.println("File not found!!" + e);
 		}
+	}
+	
+	public int getRowNumber() {
+		int num=0;
+		try {
+			num =workbook.getSheet(sheetName).getLastRowNum();
+		}catch(Exception e) {
+			log.error("Sheet not exist",e);
+		}
+		return num;
 	}
 
 	public HashMap<Integer, ArrayList<String>> getAllValues() {
@@ -60,7 +77,7 @@ public class ReadExcelData {
 				data.clear();
 			}
 		} catch (NullPointerException e) {
-			System.out.println(e);
+			log.error(e);
 		}
 		return readValue;
 	}
