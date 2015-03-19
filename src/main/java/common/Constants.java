@@ -12,4 +12,5 @@ public static final String TEST_SUITENAME = "SampleSuite";
 public static final String TEST_SUITESHEET = "TestSuite";
 public static final String REPORT_TITLE = "Some sample test";
 public static final Integer THREAD_COUNT = 2;
+public static final Integer WEBDRIVERWAIT_TIMEOUT = 30;
 }

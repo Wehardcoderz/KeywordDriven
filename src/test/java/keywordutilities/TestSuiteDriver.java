@@ -19,7 +19,7 @@ import common.Constants;
 import common.ReadExcelData;
 
 public class TestSuiteDriver implements Constants{
-	private static Logger log = Logger.getLogger(TestSuiteDriver.class);
+	//private static Logger log = Logger.getLogger(TestSuiteDriver.class);
 
 	public static void main(String[] args) throws IOException {
 
@@ -31,7 +31,7 @@ public class TestSuiteDriver implements Constants{
 		XmlTest test = new XmlTest(suite);
 		test.setName("Default Test");
 		List<XmlClass> classes = new ArrayList<XmlClass>();
-		classes.add(new XmlClass("keywordutilities.NewTest"));
+		classes.add(new XmlClass("keywordutilities.TestDriver"));
 		test.setXmlClasses(classes);
 		List<XmlTest> tests = new ArrayList<XmlTest>();
 		 tests.add(test);

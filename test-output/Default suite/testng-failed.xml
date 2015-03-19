@@ -6,7 +6,6 @@
       <class name="keywordutilities.NewTest">
         <methods>
           <include name="f"/>
-          <include name="f"/>
           <include name="tearDown"/>
           <include name="setUp"/>
         </methods>

@@ -25,7 +25,7 @@ public class WebdriverManager {
 			driverThread.set(d);
 		} else
 			Assert.fail("No browsers specified");
-		d.get("https://www.google.co.in/");
+		d.get("https://developer.vuforia.com/");
 		d.manage().window().maximize();
 		d.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 		}
