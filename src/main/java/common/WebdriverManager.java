@@ -27,7 +27,7 @@ public class WebdriverManager {
 			Assert.fail("No browsers specified");
 		d.get("https://developer.vuforia.com/");
 		d.manage().window().maximize();
-		d.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+		d.manage().timeouts().implicitlyWait(Constants.IMPLICIT_WAIT, TimeUnit.SECONDS);
 		}
 		driverThread.set(d);
 	}

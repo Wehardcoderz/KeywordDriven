@@ -1,8 +1,16 @@
-2015-Jan-31 18:56:14,674  INFO NewTest:37 - setup for HomePageTest
-2015-Jan-31 18:56:14,690  INFO MyTestContext:24 - Test Log : 
-now executing HomePageTest
-2015-Jan-31 18:56:14,691  INFO NewTest:44 - teardown for HomePageTest
-2015-Jan-31 18:56:14,693  INFO NewTest:37 - setup for LoginTest
-2015-Jan-31 18:56:14,693  INFO MyTestContext:24 - Test Log : 
-now executing LoginTest
-2015-Jan-31 18:56:14,699  INFO NewTest:44 - teardown for LoginTest
+2015-Mar-22 00:04:19,926  INFO KeywordBase:122 - Starting browser : firefox
+2015-Mar-22 00:04:39,968  INFO KeywordBase:265 - waitForElement for time 30
+2015-Mar-22 00:04:39,977  INFO KeywordBase:75 - Fetching element for :ID value :vuforiaLogin
+2015-Mar-22 00:04:40,063  INFO KeywordBase:133 - Clicking on LoginButton
+2015-Mar-22 00:04:40,064  INFO KeywordBase:75 - Fetching element for :ID value :vuforiaLogin
+2015-Mar-22 00:04:40,289  INFO KeywordBase:354 - Assert by element LoginUserName value True|User name text box is not displayed
+2015-Mar-22 00:04:40,289  INFO KeywordBase:75 - Fetching element for :ID value :edit-popup-user-name-login
+2015-Mar-22 00:04:40,439  INFO KeywordBase:143 - Typing c_vmysor@qce.qualcomm.com
+2015-Mar-22 00:04:40,439  INFO KeywordBase:75 - Fetching element for :ID value :edit-popup-user-name-login
+2015-Mar-22 00:04:40,690  INFO KeywordBase:143 - Typing Test12345
+2015-Mar-22 00:04:40,691  INFO KeywordBase:75 - Fetching element for :ID value :edit-popup-user-pass-login
+2015-Mar-22 00:04:41,001  INFO KeywordBase:133 - Clicking on LoginSubmit
+2015-Mar-22 00:04:41,002  INFO KeywordBase:75 - Fetching element for :ID value :edit-submit-2
+2015-Mar-22 00:04:48,433  INFO KeywordBase:75 - Fetching element for :ID value :loadingDiv
+2015-Mar-22 00:04:53,608  INFO KeywordBase:338 - Assert by Text UserName value Hello vmysorbeta12|user not loggedin
+2015-Mar-22 00:04:53,609  INFO KeywordBase:75 - Fetching element for :ID value :userName

@@ -2,13 +2,7 @@ package keywordutilities;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-import java.util.Map.Entry;
-
-import org.apache.log4j.Logger;
 import org.testng.TestListenerAdapter;
 import org.testng.TestNG;
 import org.testng.xml.XmlClass;
@@ -16,7 +10,6 @@ import org.testng.xml.XmlSuite;
 import org.testng.xml.XmlTest;
 
 import common.Constants;
-import common.ReadExcelData;
 
 public class TestSuiteDriver implements Constants{
 	//private static Logger log = Logger.getLogger(TestSuiteDriver.class);

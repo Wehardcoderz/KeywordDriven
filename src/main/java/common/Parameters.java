@@ -4,7 +4,6 @@ import java.io.File;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -24,8 +23,7 @@ public class Parameters {
 			System.out.println("Invalid log properties file!");
 			System.exit(1);
 		}
-		
-		BasicConfigurator.configure();
+		//BasicConfigurator.configure();
 		PropertyConfigurator.configure(Constants.LOG4J_PATH);
 
 		try {

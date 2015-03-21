@@ -26,7 +26,7 @@ public class KeywordBase implements Constants {
 	private static Properties OR;
 	private static Logger log = Logger.getLogger(KeywordBase.class);
 	private static RemoteWebDriver d;
-	public static WebDriverWait wait;
+	private static WebDriverWait wait;
 
 	/**
 	 * @param d
@@ -34,7 +34,6 @@ public class KeywordBase implements Constants {
 	public KeywordBase(RemoteWebDriver d) {
 		KeywordBase.d = d;
 		parameters = new Parameters();
-		wait = new WebDriverWait(d, WEBDRIVERWAIT_TIMEOUT);
 	}
 
 	/**
@@ -83,15 +82,36 @@ public class KeywordBase implements Constants {
 	 * @return
 	 */
 	private static WebElement getElement(String locator, String... index) {
-		initOR();
-		String loc = OR.getProperty(locator);
 		WebElement element = null;
-		By by = getBy(loc);
-		if (index.length != 0)
-			element = d.findElements(by).get(Integer.parseInt(index[0]));
-		else
-			element = d.findElement(by);
+		try {
+			initOR();
+			String loc = OR.getProperty(locator);
+			By by = getBy(loc);
+			if (index.length != 0)
+				element = d.findElements(by).get(Integer.parseInt(index[0]));
+			else
+				element = d.findElement(by);
+		} catch (NullPointerException n) {
+			log.error("NullPointerException for : " + locator);
+		}
 		return element;
+	}
+
+	/**
+	 * 
+	 * @param locator
+	 * @return
+	 */
+	public static By getElement(String locator) {
+		By by = null;
+		try {
+			initOR();
+			String loc = OR.getProperty(locator);
+			by = getBy(loc);
+		} catch (NullPointerException n) {
+			log.error("NullPointerException for : " + locator);
+		}
+		return by;
 	}
 
 	/**
@@ -100,16 +120,18 @@ public class KeywordBase implements Constants {
 	private static void startDriver(String browser) {
 		WebdriverManager.setupDriver(browser);
 		log.info("Starting browser : " + browser);
-		WebdriverManager.getDriverInstance();
+		WebdriverManager.startDriver();
+		d = WebdriverManager.getDriverInstance();
+		wait = new WebDriverWait(d, WEBDRIVERWAIT_TIMEOUT);
 	}
 
 	/**
-	 * @param s
+	 * @param locator
 	 * @param index
 	 */
-	public static void click(String s, String... index) {
-		log.info("Clicking on " + s);
-		getElement(s, index).click();
+	public static void click(String locator, String... index) {
+		log.info("Clicking on " + locator);
+		getElement(locator, index).click();
 	}
 
 	/**
@@ -117,7 +139,7 @@ public class KeywordBase implements Constants {
 	 * @param val
 	 * @param index
 	 */
-	private static void type(String locator, String val, String... index) {
+	public static void type(String locator, String val, String... index) {
 		log.info("Typing " + val);
 		WebElement e = getElement(locator, index);
 		e.clear();
@@ -172,24 +194,14 @@ public class KeywordBase implements Constants {
 	/**
 	 * 
 	 */
-	private static void stopDriver() {
+	public static void stopDriver() {
 		WebdriverManager.stopDriver();
-	}
-
-	/**
-	 * @param locator
-	 * @param index
-	 * @return
-	 */
-	public static String getText(String locator, String... index) {
-		log.info("Get text " + locator);
-		return getElement(locator, index).getText();
 	}
 
 	/**
 	 * @param value
 	 */
-	public void executeScript(String value) {
+	public static void executeScript(String value) {
 		JavascriptExecutor js = (JavascriptExecutor) d;
 		js.executeScript(value);
 	}
@@ -198,23 +210,13 @@ public class KeywordBase implements Constants {
 
 	/**
 	 * @param locator
-	 * @param value
+	 * @param time
 	 * @param index
 	 */
-	public static void waitForElementByElement(String locator, String value,
-			String... index) {
-		wait.until(ExpectedConditions.visibilityOf(getElement(locator, index)));
-	}
-
-	/**
-	 * @param locator
-	 * @param value
-	 * @param index
-	 */
-	public void customWaitForElementEnabled(final String locator, String value,
+	public static void waitForElementEnabled(final String locator, String time,
 			final String... index) {
-		log.info("customWaitForElementEnabled for time " + value);
-		(new WebDriverWait(d, Integer.parseInt(value)))
+		log.info("customWaitForElementEnabled for time " + time);
+		(new WebDriverWait(d, Integer.parseInt(time)))
 				.until(new ExpectedCondition<Boolean>() {
 					public Boolean apply(WebDriver d) {
 						return (getElement(locator, index)).isEnabled();
@@ -226,7 +228,7 @@ public class KeywordBase implements Constants {
 	 * @param locator
 	 * @param index
 	 */
-	public void waitForElementEnabled(final String locator,
+	public static void waitForElementEnabled(final String locator,
 			final String... index) {
 		log.info("customWaitForElementEnabled for time "
 				+ WEBDRIVERWAIT_TIMEOUT);
@@ -240,13 +242,13 @@ public class KeywordBase implements Constants {
 
 	/**
 	 * @param locator
-	 * @param value
+	 * @param time
 	 * @param index
 	 */
-	public void waitForElement(final String locator, String value,
+	public static void waitForElementBy(final String locator, String time,
 			final String... index) {
-		log.info("waitForElement for time " + value);
-		(new WebDriverWait(d, Integer.parseInt(value)))
+		log.info("waitForElement for time " + time);
+		(new WebDriverWait(d, Integer.parseInt(time)))
 				.until(new ExpectedCondition<WebElement>() {
 					public WebElement apply(WebDriver d) {
 						return getElement(locator, index);
@@ -258,7 +260,8 @@ public class KeywordBase implements Constants {
 	 * @param locator
 	 * @param index
 	 */
-	public void waitForElement(final String locator, final String... index) {
+	public static void waitForElement(final String locator,
+			final String... index) {
 		log.info("waitForElement for time " + WEBDRIVERWAIT_TIMEOUT);
 		(new WebDriverWait(d, WEBDRIVERWAIT_TIMEOUT))
 				.until(new ExpectedCondition<WebElement>() {
@@ -271,13 +274,13 @@ public class KeywordBase implements Constants {
 
 	/**
 	 * @param locator
-	 * @param value
+	 * @param time
 	 * @param index
 	 */
-	public void waitForElementByDisplayed(final String locator, String value,
-			final String... index) {
-		log.info("waitForElementByDisplayed " + value);
-		(new WebDriverWait(d, Integer.parseInt(value)))
+	public static void waitForElementDisplayedBy(final String locator,
+			String time, final String... index) {
+		log.info("waitForElementByDisplayed " + time);
+		(new WebDriverWait(d, Integer.parseInt(time)))
 				.until(new ExpectedCondition<Boolean>() {
 					public Boolean apply(WebDriver d) {
 						return getElement(locator, index).isDisplayed();
@@ -289,7 +292,7 @@ public class KeywordBase implements Constants {
 	 * @param locator
 	 * @param index
 	 */
-	public void waitForElementByDisplayed(final String locator,
+	public static void waitForElementDisplayed(final String locator,
 			final String... index) {
 		log.info("waitForElementByDisplayed " + WEBDRIVERWAIT_TIMEOUT);
 		(new WebDriverWait(d, WEBDRIVERWAIT_TIMEOUT))
@@ -303,8 +306,17 @@ public class KeywordBase implements Constants {
 	/**
 	 * @param title
 	 */
-	public void waitForElementByTitle(String title) {
+	public static void waitForElementByTitle(String title) {
 		wait.until(ExpectedConditions.titleContains(title));
+	}
+
+	/**
+	 * 
+	 * @param locator
+	 */
+	public static void waitForElementInvisible(final String locator) {
+		wait.until(ExpectedConditions
+				.invisibilityOfElementLocated(getElement(locator)));
 	}
 
 	/********************* Assert Statements ************************/
@@ -313,7 +325,8 @@ public class KeywordBase implements Constants {
 	 * @return
 	 */
 	public static String[] splitValueMsg(String s) {
-		return s.split("|");
+		String[] m = s.split("\\|");
+		return m;
 	}
 
 	/**
@@ -343,372 +356,11 @@ public class KeywordBase implements Constants {
 			Assert.assertEquals(getElement(locator, index).isDisplayed(),
 					Boolean.parseBoolean(splitValueMsg(value)[0]));
 		else
-			Assert.assertEquals(getElement(locator, index).getText(),
+			Assert.assertEquals(getElement(locator, index).isDisplayed(),
 					Boolean.parseBoolean(splitValueMsg(value)[0]),
 					splitValueMsg(value)[1]);
 	}
 
-	public static void main(String[] args) throws IOException {
-		startDriver("firefox");
-		type("searchBox", "hehe");
-		stopDriver();
-	}
-
 	/********************** JSOUP Functions under construction ******************************/
 
-	// private Document getSource() {
-	// return Jsoup.parse(d.getPageSource());
-	// }
-	//
-	// /**
-	// * Get WebElement id by text
-	// *
-	// * @param key
-	// * - Text name
-	// * @param index
-	// * - Element index. Default 0 (optional)
-	// * @return WebElement
-	// */
-	// public WebElement getElementId(String key, int... index) {
-	// String id = null;
-	// String text = null;
-	// int i = 0;
-	// try {
-	// if (index.length == 0) {
-	// while (true) {
-	// text = getSource().getElementsContainingOwnText(key).get(i)
-	// .ownText();
-	// if (text.equals(key.toString())) {
-	// id = getSource().getElementsContainingOwnText(key)
-	// .get(i).id();
-	// break;
-	// }
-	// i++;
-	// }
-	// } else
-	// id = getElementEqualsText(key, index[0]).id();
-	// if (id.isEmpty()) {
-	// Assert.fail("Element is changed or not found for : " + key);
-	// }
-	// } catch (java.lang.NullPointerException e) {
-	// Assert.fail("Element is not diaplayed in current page for :" + key);
-	// } catch (java.lang.IndexOutOfBoundsException e) {
-	// Assert.fail("Element is not diaplayed in current page for :" + key);
-	// }
-	// return d.findElement(By.id(id));
-	// }
-	//
-	// /**
-	// * Get next WebElement id by text
-	// *
-	// * @param key
-	// * - Text name
-	// * @param index
-	// * - Next element sibling index
-	// * @param child
-	// * - Child element index if any (optional)
-	// * @return WebElement
-	// */
-	// public WebElement getNextElementId(String key, int index, int... child) {
-	// String id = null;
-	// Element next = null;
-	// try {
-	// next = getElementEqualsText(key);
-	// for (int j = 0; j <= index; j++) {
-	// if (next.nextElementSibling() == null)
-	// next = next.parent().nextElementSibling();
-	// else
-	// next = next.nextElementSibling();
-	// if (j == index)
-	// id = next.id();
-	// }
-	// if (id != null && child.length != 0) {
-	// id = next.children().get(child[0]).id();
-	// }
-	// if (id.isEmpty()) {
-	// Assert.fail("Element is changed or not found for : " + key);
-	// }
-	// } catch (java.lang.NullPointerException e) {
-	// Assert.fail("Element is not diaplayed in current page for :" + key);
-	// } catch (java.lang.IndexOutOfBoundsException e) {
-	// Assert.fail("Element is not diaplayed in current page for :" + key);
-	// }
-	// return d.findElement(By.id(id));
-	// }
-	//
-	// /**
-	// * Get previous WebElement id by text
-	// *
-	// * @param key
-	// * - Text name
-	// * @param index
-	// * - Next element sibling index
-	// * @param child
-	// * - Child element index if any (optional)
-	// * @return WebElement
-	// */
-	// public WebElement getPreviousElementId(String key, int index, int...
-	// child) {
-	// String id = null;
-	// Element next = null;
-	// try {
-	// next = getElementEqualsText(key);
-	// for (int j = 0; j <= index; j++) {
-	// if (next.nextElementSibling() == null)
-	// next = next.parent().previousElementSibling();
-	// else
-	// next = next.previousElementSibling();
-	// if (j == index)
-	// id = next.id();
-	// }
-	// if (id != null && child.length != 0) {
-	// id = next.children().get(child[0]).id();
-	// }
-	// if (id.isEmpty()) {
-	// Assert.fail("Element is changed or not found for : " + key);
-	// }
-	// } catch (java.lang.NullPointerException e) {
-	// Assert.fail("Element is not diaplayed in current page for :" + key);
-	// } catch (java.lang.IndexOutOfBoundsException e) {
-	// Assert.fail("Element is not diaplayed in current page for :" + key);
-	// }
-	// return d.findElement(By.id(id));
-	// }
-	//
-	// /**
-	// * Get WebElement css selector by text
-	// *
-	// * @param key
-	// * - Text name
-	// * @param index
-	// * - Element index. Default 0 (optional)
-	// * @return WebElement
-	// */
-	// public WebElement getElementCssSelector(String key, int... index) {
-	// String css = "";
-	// String text = "";
-	// int i = 0;
-	// try {
-	// if (index.length == 0) {
-	// while (true) {
-	// text = getSource().getElementsContainingOwnText(key).get(i)
-	// .ownText();
-	// if (text.equals(key.toString())) {
-	// css = getSource().getElementsContainingOwnText(key)
-	// .get(i).cssSelector();
-	// break;
-	// }
-	// i++;
-	// }
-	// } else
-	// css = getElementEqualsText(key, index[0]).cssSelector();
-	// if (css.isEmpty()) {
-	// Assert.fail("Element is changed or not found for : " + key);
-	// }
-	// } catch (java.lang.NullPointerException e) {
-	// Assert.fail("Element is not diaplayed in current page for :" + key);
-	// } catch (java.lang.IndexOutOfBoundsException e) {
-	// Assert.fail("Element is not diaplayed in current page for :" + key);
-	// }
-	// return d.findElement(By.cssSelector(css));
-	// }
-	//
-	// /**
-	// * Get next WebElement css selector by text
-	// *
-	// * @param key
-	// * - text name
-	// * @param index
-	// * - Next element sibling index
-	// * @param child
-	// * - Child element index if any (optional)
-	// * @return WebElement
-	// */
-	// public WebElement getNextElementCssSelector(String key, int index,
-	// int... child) {
-	// String css = null;
-	// Element next = null;
-	// try {
-	//
-	// next = getElementEqualsText(key);
-	// for (int j = 0; j <= index; j++) {
-	// if (next.nextElementSibling() == null)
-	// next = next.parent().nextElementSibling();
-	// else
-	// next = next.nextElementSibling();
-	// if (j == index)
-	// css = next.cssSelector();
-	// }
-	// if (css != null && child.length != 0) {
-	// css = next.children().get(child[0]).cssSelector();
-	// }
-	// if (css.isEmpty()) {
-	// Assert.fail("Element is changed or not found for : " + key);
-	// }
-	// } catch (java.lang.NullPointerException e) {
-	// Assert.fail("Element is not diaplayed in current page for :" + key);
-	// } catch (java.lang.IndexOutOfBoundsException e) {
-	// Assert.fail("Element is not diaplayed in current page for :" + key);
-	// }
-	// return d.findElement(By.cssSelector(css));
-	// }
-	//
-	// /**
-	// * Get next WebElement css selector string by text
-	// *
-	// * @param key
-	// * - text name
-	// * @param index
-	// * - Next element sibling index
-	// * @param child
-	// * - Child element index if any (optional)
-	// * @return String
-	// */
-	// public String getNextCssSelector(String key, int index, int... child) {
-	// String css = null;
-	// Element next = null;
-	// try {
-	//
-	// next = getElementEqualsText(key);
-	// for (int j = 0; j <= index; j++) {
-	// if (next.nextElementSibling() == null)
-	// next = next.parent().nextElementSibling();
-	// else
-	// next = next.nextElementSibling();
-	// if (j == index)
-	// css = next.cssSelector();
-	// }
-	// if (css != null && child.length != 0) {
-	// css = next.children().get(child[0]).cssSelector();
-	// }
-	// if (css.isEmpty()) {
-	// Assert.fail("Element is changed or not found for : " + key);
-	// }
-	// } catch (java.lang.NullPointerException e) {
-	// Assert.fail("Element is not diaplayed in current page for :" + key);
-	// } catch (java.lang.IndexOutOfBoundsException e) {
-	// Assert.fail("Element is not diaplayed in current page for :" + key);
-	// }
-	// return css;
-	// }
-	//
-	// /**
-	// * Get next WebElements css selector by text. Can select element matching
-	// * the same criteria.
-	// *
-	// * @param key
-	// * - text name
-	// * @param index
-	// * - Next element sibling index
-	// * @param elements
-	// * - index of the WebElements
-	// * @param child
-	// * - Child element index if any (optional)
-	// * @return WebElement
-	// */
-	// public WebElement getNextElementsCssSelector(String key, int index,
-	// int elements, int... child) {
-	// String css = null;
-	// Element next = null;
-	// try {
-	//
-	// next = getElementEqualsText(key, elements);
-	// for (int j = 0; j <= index; j++) {
-	// if (next.nextElementSibling() == null)
-	// next = next.parent().nextElementSibling();
-	// else
-	// next = next.nextElementSibling();
-	// if (j == index)
-	// css = next.cssSelector();
-	// }
-	// if (css != null && child.length != 0) {
-	// css = next.children().get(child[0]).cssSelector();
-	// }
-	// if (css.isEmpty()) {
-	// Assert.fail("Element is changed or not found for : " + key);
-	// }
-	// } catch (java.lang.NullPointerException e) {
-	// Assert.fail("Element is not diaplayed in current page for :" + key);
-	// } catch (java.lang.IndexOutOfBoundsException e) {
-	// Assert.fail("Element is not diaplayed in current page for :" + key);
-	// }
-	// return d.findElement(By.cssSelector(css));
-	// }
-	//
-	// private Element getElementEqualsText(String key, int... i) {
-	// String text = null;
-	// int index = 0;
-	// Element next = null;
-	// try {
-	// while (true) {
-	// text = getSource().getElementsContainingOwnText(key).get(index)
-	// .ownText().trim();
-	// if (text.equals(key.toString())) {
-	// next = getSource().getElementsContainingOwnText(key).get(
-	// index);
-	// break;
-	// }
-	// index++;
-	// }
-	// if (i.length != 0) {
-	// next = getSource().getElementsContainingOwnText(key).get(
-	// index + i[0]);
-	// }
-	// } catch (java.lang.IndexOutOfBoundsException e) {
-	// Assert.fail("Element is not diaplayed in current page for :" + key);
-	// }
-	// return next;
-	// }
-	//
-	// /**
-	// * Get WebElement ID by value
-	// *
-	// * @param key
-	// * - text
-	// * @param index
-	// * - index (optional)
-	// * @return
-	// */
-	// public WebElement getElementIdByValue(String key, int... index) {
-	// String id = null;
-	// try {
-	// id = getSource().getElementsByAttributeValue("value", key).first()
-	// .id();
-	// if (index.length != 0) {
-	// id = getSource().getElementsByAttributeValue("value", key)
-	// .get(index[0]).id();
-	// }
-	// } catch (java.lang.NullPointerException e) {
-	// Assert.fail("Element is not diaplayed in current page for :" + key);
-	// } catch (java.lang.IndexOutOfBoundsException e) {
-	// Assert.fail("Element is not diaplayed in current page for :" + key);
-	// }
-	// return d.findElement(By.id(id));
-	// }
-	//
-	// /**
-	// * Get WebElement CSS Selector by value
-	// *
-	// * @param key
-	// * - text
-	// * @param index
-	// * - index (optional)
-	// * @return
-	// */
-	// public WebElement getElementCSSByValue(String key, int... index) {
-	// String id = null;
-	// try {
-	// id = getSource().getElementsByAttributeValue("value", key).first()
-	// .cssSelector();
-	// if (index.length != 0) {
-	// id = getSource().getElementsByAttributeValue("value", key)
-	// .get(index[0]).cssSelector();
-	// }
-	// } catch (java.lang.NullPointerException e) {
-	// Assert.fail("Element is not diaplayed in current page for :" + key);
-	// } catch (java.lang.IndexOutOfBoundsException e) {
-	// Assert.fail("Element is not diaplayed in current page for :" + key);
-	// }
-	// return d.findElement(By.cssSelector(id));
-	// }//
 }
