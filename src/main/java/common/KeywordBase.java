@@ -1,3 +1,21 @@
+/*******************************************************************************
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *******************************************************************************/
 package common;
 
 import java.io.File;
@@ -30,7 +48,7 @@ import common.WebdriverManager;
  *
  */
 public class KeywordBase implements Constants {
-	Parameters parameters;
+	private static int expTime = 0;
 	private static Properties OR;
 	private static Logger log = Logger.getLogger(KeywordBase.class);
 	private static RemoteWebDriver d;
@@ -40,9 +58,13 @@ public class KeywordBase implements Constants {
 	 * @param d
 	 *            driver
 	 */
-	public KeywordBase(RemoteWebDriver d) {
-		KeywordBase.d = d;
-		parameters = new Parameters();
+	public KeywordBase(Parameters p) {
+		startDriver(p.getBrowsers());
+		KeywordBase.d = WebdriverManager.getDriverInstance();
+		if (p.getExplicitWait() == 0)
+			expTime = 30;
+		else
+			expTime = p.getExplicitWait();
 	}
 
 	/**
@@ -138,13 +160,12 @@ public class KeywordBase implements Constants {
 	/**
 	 * @param browser
 	 */
-	@SuppressWarnings("unused")
 	private static void startDriver(String browser) {
 		WebdriverManager.setupDriver(browser);
 		log.info("Starting browser : " + browser);
 		WebdriverManager.startDriver();
 		d = WebdriverManager.getDriverInstance();
-		wait = new WebDriverWait(d, WEBDRIVERWAIT_TIMEOUT);
+		wait = new WebDriverWait(d, 30);
 	}
 
 	/**
@@ -180,16 +201,17 @@ public class KeywordBase implements Constants {
 	 * 
 	 * @param locator
 	 *            HTML element locator from Object Repository file.
-	 * @param val
+	 * @param value
+	 *            Value
 	 * @param index
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
 	 */
-	public static void type(String locator, String val, String... index) {
-		log.info("Typing " + val);
+	public static void type(String locator, String value, String... index) {
+		log.info("Typing " + value);
 		WebElement e = getElement(locator, index);
 		e.clear();
-		e.sendKeys(val);
+		e.sendKeys(value);
 	}
 
 	/**
@@ -211,6 +233,7 @@ public class KeywordBase implements Constants {
 	 * @param locator
 	 *            HTML element locator from Object Repository file.
 	 * @param i
+	 *            Drop downvalue index.
 	 * @param index
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
@@ -228,6 +251,7 @@ public class KeywordBase implements Constants {
 	 * @param locator
 	 *            HTML element locator from Object Repository file.
 	 * @param value
+	 *            Value
 	 * @param index
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
@@ -246,6 +270,7 @@ public class KeywordBase implements Constants {
 	 * @param locator
 	 *            HTML element locator from Object Repository file.
 	 * @param value
+	 *            Value
 	 * @param index
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
@@ -287,6 +312,7 @@ public class KeywordBase implements Constants {
 	 * Will perform javascript actions for an element
 	 * 
 	 * @param value
+	 *            Value
 	 * @param locator
 	 *            HTML element locator from Object Repository file.
 	 * @param index
@@ -297,6 +323,15 @@ public class KeywordBase implements Constants {
 			String... index) {
 		JavascriptExecutor js = (JavascriptExecutor) d;
 		js.executeScript(value, getElement(locator, index));
+	}
+
+	/**
+	 * To print message in report
+	 * 
+	 * @param message
+	 */
+	public static void log(String message) {
+		MyTestContext.setMessage(message);
 	}
 
 	/******************** iFrame, Window and Alert usage ********************/
@@ -389,7 +424,8 @@ public class KeywordBase implements Constants {
 	 * 
 	 * @param locator
 	 *            HTML element locator from Object Repository file.
-	 * @param time Maximum waiting time. Test fails beyond this time.
+	 * @param time
+	 *            Maximum waiting time. Test fails beyond this time.
 	 * @param index
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
@@ -417,15 +453,13 @@ public class KeywordBase implements Constants {
 	 */
 	public static void waitForElementEnabled(final String locator,
 			final String... index) {
-		log.info("customWaitForElementEnabled for time "
-				+ WEBDRIVERWAIT_TIMEOUT);
+		log.info("customWaitForElementEnabled for time " + expTime);
 
-		(new WebDriverWait(d, WEBDRIVERWAIT_TIMEOUT))
-				.until(new ExpectedCondition<Boolean>() {
-					public Boolean apply(WebDriver d) {
-						return (getElement(locator, index)).isEnabled();
-					}
-				});
+		(new WebDriverWait(d, expTime)).until(new ExpectedCondition<Boolean>() {
+			public Boolean apply(WebDriver d) {
+				return (getElement(locator, index)).isEnabled();
+			}
+		});
 	}
 
 	/**
@@ -433,7 +467,8 @@ public class KeywordBase implements Constants {
 	 * 
 	 * @param locator
 	 *            HTML element locator from Object Repository file.
-	 * @param time Maximum waiting time. Test fails beyond this time.
+	 * @param time
+	 *            Maximum waiting time. Test fails beyond this time.
 	 * @param index
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
@@ -461,9 +496,9 @@ public class KeywordBase implements Constants {
 	 */
 	public static void waitForElement(final String locator,
 			final String... index) {
-		log.info("waitForElement for time " + WEBDRIVERWAIT_TIMEOUT);
+		log.info("waitForElement for time " + expTime);
 
-		(new WebDriverWait(d, WEBDRIVERWAIT_TIMEOUT))
+		(new WebDriverWait(d, expTime))
 				.until(new ExpectedCondition<WebElement>() {
 					public WebElement apply(WebDriver d) {
 						return getElement(locator, index);
@@ -506,20 +541,20 @@ public class KeywordBase implements Constants {
 	 */
 	public static void waitForElementDisplayed(final String locator,
 			final String... index) {
-		log.info("waitForElementByDisplayed " + WEBDRIVERWAIT_TIMEOUT);
+		log.info("waitForElementByDisplayed " + expTime);
 
-		(new WebDriverWait(d, WEBDRIVERWAIT_TIMEOUT))
-				.until(new ExpectedCondition<Boolean>() {
-					public Boolean apply(WebDriver d) {
-						return getElement(locator, index).isDisplayed();
-					}
-				});
+		(new WebDriverWait(d, expTime)).until(new ExpectedCondition<Boolean>() {
+			public Boolean apply(WebDriver d) {
+				return getElement(locator, index).isDisplayed();
+			}
+		});
 	}
 
 	/**
 	 * Wait until title is displayed
 	 * 
-	 * @param title Title of the page.
+	 * @param title
+	 *            Title of the page.
 	 */
 	public static void waitForElementByTitle(String title) {
 		wait.until(ExpectedConditions.titleContains(title));
@@ -552,7 +587,9 @@ public class KeywordBase implements Constants {
 	 * 
 	 * @param locator
 	 *            HTML element locator from Object Repository file.
-	 * @param text Expected value and message.(Separated by pipe '|' if message to be printed)
+	 * @param text
+	 *            Expected value and message.(Separated by pipe '|' if message
+	 *            to be printed)
 	 * @param index
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
@@ -575,7 +612,9 @@ public class KeywordBase implements Constants {
 	 * 
 	 * @param locator
 	 *            HTML element locator from Object Repository file.
-	 * @param value Expected value and message.(Separated by pipe '|' if message to be printed)
+	 * @param value
+	 *            Expected value and message.(Separated by pipe '|' if message
+	 *            to be printed)
 	 * @param index
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
@@ -596,7 +635,8 @@ public class KeywordBase implements Constants {
 	 * Assert title. Sequence should be expected value '|' message to print if
 	 * it fails. For example : expectedValue|Expected value is not displayed.
 	 * 
-	 * @param title Expected title of the page
+	 * @param title
+	 *            Expected title of the page
 	 */
 	public static void assertTitle(String title) {
 		log.info("Assert by title " + title);
@@ -616,7 +656,8 @@ public class KeywordBase implements Constants {
 	 * 
 	 * @param locator
 	 *            HTML element locator from Object Repository file.
-	 * @param bool Expected boolean value. (true or false)
+	 * @param bool
+	 *            Expected boolean value. (true or false)
 	 * @param index
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
@@ -641,7 +682,8 @@ public class KeywordBase implements Constants {
 	 * 
 	 * @param locator
 	 *            HTML element locator from Object Repository file.
-	 * @param bool Expected boolean value. (true or false)
+	 * @param bool
+	 *            Expected boolean value. (true or false)
 	 * @param index
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
@@ -667,7 +709,8 @@ public class KeywordBase implements Constants {
 	 * 
 	 * @param locator
 	 *            HTML element locator from Object Repository file.
-	 * @param option Expected selected option.
+	 * @param option
+	 *            Expected selected option.
 	 * @param index
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.

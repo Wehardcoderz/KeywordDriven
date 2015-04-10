@@ -1,3 +1,21 @@
+/*******************************************************************************
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *******************************************************************************/
 package common;
 
 import java.io.FileInputStream;
@@ -5,18 +23,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import keywordutilities.TestSuiteDriver;
 
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.testng.Assert;
-
+/**
+ * 
+ * @author Vishshady
+ *
+ */
 public class ReadExcelData {
 	private static Logger log = Logger.getLogger(ReadExcelData.class);
 	FileInputStream fileInputStream = null;
@@ -26,26 +43,51 @@ public class ReadExcelData {
 	Cell cell;
 	public String sheetName;
 
-
-	public ReadExcelData(String path, String sheetName) {
-		log.info("started");
+	public ReadExcelData(Parameters p, String sheetName) {
 		this.sheetName = sheetName;
 		try {
-			fileInputStream = new FileInputStream(path);
+			fileInputStream = new FileInputStream(p.getTestcasePath());
 			workbook = new HSSFWorkbook(fileInputStream);
 		} catch (IOException e) {
-			System.out.println("File not found!!" + e);
+			log.error("File not found!!" + e);
+			System.exit(1);
 		}
 	}
 	
-	public int getRowNumber() {
-		int num=0;
+	public ReadExcelData(Parameters p) {
 		try {
-			num =workbook.getSheet(sheetName).getLastRowNum();
-		}catch(Exception e) {
-			log.error("Sheet not exist",e);
+			fileInputStream = new FileInputStream(p.getTestcasePath());
+			workbook = new HSSFWorkbook(fileInputStream);
+		} catch (IOException e) {
+			log.error("File not found!!" + e);
+			System.exit(1);
+		}
+	}
+	
+	public String setSheet(int i){
+		this.sheetName = workbook.getSheetName(i);
+		return this.sheetName;
+	}
+	
+	public Boolean isSheetPresent(int index,String sheetName) {
+		boolean present = false;
+		present = workbook.getSheetAt(index).getSheetName().equalsIgnoreCase(sheetName);
+		return present;
+	}
+	
+
+	public int getRowNumber() {
+		int num = 0;
+		try {
+			num = workbook.getSheet(sheetName).getLastRowNum();
+		} catch (Exception e) {
+			log.error("Sheet not exist", e);
 		}
 		return num;
+	}
+	
+	public int getSheetCount() {
+		return workbook.getNumberOfSheets();
 	}
 
 	public HashMap<Integer, ArrayList<String>> getAllValues() {
@@ -58,28 +100,43 @@ public class ReadExcelData {
 			int count = 0;
 			while (rowIterator.hasNext()) {
 				row = rowIterator.next();
-				Iterator<Cell> cellIterator = row.iterator();
-				while (cellIterator.hasNext()) {
-					cell = cellIterator.next();
-					switch (cell.getCellType()) {
-					case Cell.CELL_TYPE_NUMERIC:
-						data.add(String.valueOf(((long) cell
-								.getNumericCellValue())));
-						break;
-					case Cell.CELL_TYPE_STRING:
-						data.add(cell.getStringCellValue());
-						break;
+				if (!isRowEmpty(row)) {
+					Iterator<Cell> cellIterator = row.iterator();
+					while (cellIterator.hasNext()) {
+						cell = cellIterator.next();
+						switch (cell.getCellType()) {
+						case Cell.CELL_TYPE_NUMERIC:
+							data.add(String.valueOf(((long) cell
+									.getNumericCellValue())));
+							break;
+						case Cell.CELL_TYPE_STRING:
+							data.add(cell.getStringCellValue());
+							break;
+						case Cell.CELL_TYPE_BOOLEAN:
+							data.add(String.valueOf(cell.getBooleanCellValue()));
+							break;
+						}
+						if (cell == null
+								|| cell.getCellType() == Cell.CELL_TYPE_BLANK)
+							data.add(null);
 					}
-					if(cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK)
-						data.add(null);
+					readValue.put(count++, new ArrayList<String>(data));
+					data.clear();
 				}
-				readValue.put(count++, new ArrayList<String>(data));
-				data.clear();
 			}
 		} catch (NullPointerException e) {
 			log.error(e);
 		}
 		return readValue;
+	}
+
+	public static boolean isRowEmpty(Row row) {
+		for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
+			Cell cell = row.getCell(c);
+			if (cell != null && cell.getCellType() != Cell.CELL_TYPE_BLANK)
+				return false;
+		}
+		return true;
 	}
 
 	public Integer findRow(HSSFSheet sheet, int cellContent) {
@@ -94,6 +151,34 @@ public class ReadExcelData {
 			}
 		}
 		return null;
+	}
+	
+	public ArrayList<String> getColumnValue(String sheetName, String header) {
+		HSSFSheet sheet = workbook.getSheet(sheetName);
+		ArrayList<String> list = new ArrayList<String>();
+		int index = 0;
+		for(Row r : sheet) {
+			for(Cell c : r) {
+				if (c.getCellType() != Cell.CELL_TYPE_NUMERIC)
+				if(c.getStringCellValue().equals(header))
+					index = c.getColumnIndex();
+			}
+			list.add(r.getCell(index).getStringCellValue());
+		}
+		return list;
+	}
+	
+	public ArrayList<String> getRowValue(String sheetName, int row) {
+		HSSFSheet sheet = workbook.getSheet(sheetName);
+		ArrayList<String> list = new ArrayList<String>();
+		Row r = sheet.getRow(row);
+		for(Cell c: r) {
+			if(c.getCellType()==Cell.CELL_TYPE_STRING)
+				list.add(c.getStringCellValue());
+			else if (c.getCellType()==Cell.CELL_TYPE_NUMERIC)
+				list.add(String.valueOf(c.getNumericCellValue()));
+		}
+		return list;
 	}
 
 	public HashMap<Integer, ArrayList<String>> getValues() {
@@ -159,16 +244,12 @@ public class ReadExcelData {
 		return cellValue;
 	}
 
-	public static void main(String[] args) throws IOException {
-		ReadExcelData read = new ReadExcelData("TestCase.xls","");
-		HashMap<Integer, ArrayList<String>> keyset = new HashMap<Integer, ArrayList<String>>();
-		keyset = read.getAllValues();
-		Set<Entry<Integer, ArrayList<String>>> set = keyset.entrySet();
-
-		for (Entry<Integer, ArrayList<String>> me : set)
-			System.out.println(me.getKey() + " " + me.getValue());
-
-		System.out.println(read.getCellValue( 1, "Command"));
-	}
+//	public static void main(String[] args) throws IOException {
+//		Parameters p = new Parameters();
+//		ReadExcelData read = new ReadExcelData(p, "TestSuite");
+//	
+//		MyTestContext.checkExcel();
+//	
+//	}
 
 }

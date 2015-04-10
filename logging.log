@@ -1,16 +1,24 @@
-2015-Mar-22 00:04:19,926  INFO KeywordBase:122 - Starting browser : firefox
-2015-Mar-22 00:04:39,968  INFO KeywordBase:265 - waitForElement for time 30
-2015-Mar-22 00:04:39,977  INFO KeywordBase:75 - Fetching element for :ID value :vuforiaLogin
-2015-Mar-22 00:04:40,063  INFO KeywordBase:133 - Clicking on LoginButton
-2015-Mar-22 00:04:40,064  INFO KeywordBase:75 - Fetching element for :ID value :vuforiaLogin
-2015-Mar-22 00:04:40,289  INFO KeywordBase:354 - Assert by element LoginUserName value True|User name text box is not displayed
-2015-Mar-22 00:04:40,289  INFO KeywordBase:75 - Fetching element for :ID value :edit-popup-user-name-login
-2015-Mar-22 00:04:40,439  INFO KeywordBase:143 - Typing c_vmysor@qce.qualcomm.com
-2015-Mar-22 00:04:40,439  INFO KeywordBase:75 - Fetching element for :ID value :edit-popup-user-name-login
-2015-Mar-22 00:04:40,690  INFO KeywordBase:143 - Typing Test12345
-2015-Mar-22 00:04:40,691  INFO KeywordBase:75 - Fetching element for :ID value :edit-popup-user-pass-login
-2015-Mar-22 00:04:41,001  INFO KeywordBase:133 - Clicking on LoginSubmit
-2015-Mar-22 00:04:41,002  INFO KeywordBase:75 - Fetching element for :ID value :edit-submit-2
-2015-Mar-22 00:04:48,433  INFO KeywordBase:75 - Fetching element for :ID value :loadingDiv
-2015-Mar-22 00:04:53,608  INFO KeywordBase:338 - Assert by Text UserName value Hello vmysorbeta12|user not loggedin
-2015-Mar-22 00:04:53,609  INFO KeywordBase:75 - Fetching element for :ID value :userName
+2015-Apr-10 21:52:44,509  INFO TestDriver:102 - 0 [SlNo, Description, Command, Target, Value, Index]
+2015-Apr-10 21:52:44,510  INFO TestDriver:102 - 1 [1, Click on login button, click, LoginButton, null, null]
+2015-Apr-10 21:52:44,511  INFO KeywordBase:181 - Clicking on LoginButton
+2015-Apr-10 21:52:44,514  INFO KeywordBase:110 - Fetching element for :ID value :vuforiaLogin
+2015-Apr-10 21:52:44,758  INFO TestDriver:102 - 2 [2, Enter user name, type, LoginUserName, c_vmysor@qce.qualcomm.com, null]
+2015-Apr-10 21:52:44,760  INFO KeywordBase:211 - Typing c_vmysor@qce.qualcomm.com
+2015-Apr-10 21:52:44,760  INFO KeywordBase:110 - Fetching element for :ID value :edit-popup-user-name-login
+2015-Apr-10 21:52:45,028  INFO TestDriver:102 - 3 [3, Enter Password, type, LoginPassword, Test12345, null]
+2015-Apr-10 21:52:45,029  INFO KeywordBase:211 - Typing Test12345
+2015-Apr-10 21:52:45,030  INFO KeywordBase:110 - Fetching element for :ID value :edit-popup-user-pass-login
+2015-Apr-10 21:52:45,311  INFO TestDriver:102 - 4 [4, Submit, click, LoginSubmit, null, null]
+2015-Apr-10 21:52:45,311  INFO KeywordBase:181 - Clicking on LoginSubmit
+2015-Apr-10 21:52:45,313  INFO KeywordBase:110 - Fetching element for :ID value :edit-submit-2
+2015-Apr-10 21:52:52,402  INFO TestDriver:102 - 5 [5, Wait for spinner, waitForElementInvisible, Spinner, null, null]
+2015-Apr-10 21:52:52,403  INFO KeywordBase:110 - Fetching element for :ID value :loadingDiv
+2015-Apr-10 21:52:57,554  INFO TestDriver:102 - 6 [6, Check if User name is displayed, assertElementPresent, UserName, True|User is not on home page, null]
+2015-Apr-10 21:52:57,554  INFO KeywordBase:667 - Assert by element UserName bool True|User is not on home page
+2015-Apr-10 21:52:57,555  INFO KeywordBase:110 - Fetching element for :ID value :userName
+2015-Apr-10 21:52:57,683  INFO TestDriver:102 - 7 [7, Print message, log, null, User is successfully navigated to homepage, null]
+2015-Apr-10 21:52:57,684  INFO MyTestContext:49 - Test Log : 
+User is successfully navigated to homepage
+2015-Apr-10 21:52:57,684  INFO TestDriver:102 - 8 [8, logout, click, Logout, null, null]
+2015-Apr-10 21:52:57,685  INFO KeywordBase:181 - Clicking on Logout
+2015-Apr-10 21:52:57,685  INFO KeywordBase:110 - Fetching element for :ID value :vuforiaLogout
