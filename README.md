@@ -2,6 +2,7 @@ Selenword : Keydriven framework using selenium
 ----------------------------------------------
 
 Selenword is divided into three parts :
+
 1. Test Scripts: Test scripts are stored in excel sheet in .xls format.
 2. Test Driver: Test scripts are triggered using Java and TestNG class.
 3. Report : Test report is generated after the execution of all tests. 
@@ -60,7 +61,7 @@ You need to put the chrome and internet explorer driver into resource folder.
 Once all the configurations and test scripts are done, you can kick start your test suite run. Here is how
 
  - Open cmd/terminal and navigate to the folder where Selenword is downloaded.
- - Run this command "mvn exec:java-P"SelenwordTest".
+ - Run this command "mvn clean compile exec:java -PSelenwordTest".
  - Report will be generated under "SelenwordReports" folder with the time stamp, host name, total passed, failed and skipped, total time taken and steps to debug if any test failed. kool right!
  - Still dint get where the failure is? you can see the screenshots at "screenshot" folder.
 
