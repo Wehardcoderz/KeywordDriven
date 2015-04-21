@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<suite name = "sampletest" data-provider-thread-count="1" parallel="instances">
-
-    <test name="multi">
-        <classes>
-            <class name = "keywordutilities.TestDriver"></class>
-        </classes>
-    </test>
-</suite>
