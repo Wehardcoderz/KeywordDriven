@@ -20,6 +20,8 @@ package common;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -27,24 +29,28 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.Augmenter;
+import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;
+
 /**
  * 
  * @author Vishshady
  *
  */
 public class MyListener extends TestListenerAdapter {
+	private static Logger log = Logger.getLogger(MyListener.class);
 	Parameters p = new Parameters();
 	LinkedHashMap<String, Object[]> testPassed;
 	LinkedHashMap<String, Object[]> testFailed;
 	LinkedHashMap<String, Object[]> testSkipped;
-	LinkedHashMap<String, String> testLogs;
+	LinkedHashMap<String, StringBuilder> testLogs;
 	private ITestContext testContext = null;
 	String t = null;
 	long time = 0;
@@ -57,7 +63,7 @@ public class MyListener extends TestListenerAdapter {
 		testPassed = new LinkedHashMap<String, Object[]>();
 		testFailed = new LinkedHashMap<String, Object[]>();
 		testSkipped = new LinkedHashMap<String, Object[]>();
-		testLogs = new LinkedHashMap<String, String>();
+		testLogs = new LinkedHashMap<String, StringBuilder>();
 	}
 
 	@Override
@@ -79,40 +85,42 @@ public class MyListener extends TestListenerAdapter {
 
 	@Override
 	public void onTestFailure(ITestResult tr) {
-		time = tr.getEndMillis() - tr.getStartMillis();
-		time = time / 1000;
-		String testName = null;
-		for (Map.Entry<String, String> entry : MyTestContext.getTestStats()
-				.entrySet()) {
-			String[] err = null;
-			try {
-				err = tr.getThrowable().getMessage().split("\\n");
-			} catch (NullPointerException n) {
-				err = new String[] { "Fail" };
-				n.printStackTrace();
-			}
-			testName = entry.getKey();
-			testFailed.put(testName, new Object[] { entry.getValue(), err[0],
-					MyTestContext.getStep(), time });
-			t = entry.getKey();
-		}
-		addTestLogs(t);
-		MyTestContext.testStats.remove();
-		WebDriver driver = new Augmenter().augment(WebdriverManager
-				.getDriverInstance());
-		File scrFile = ((TakesScreenshot) driver)
-				.getScreenshotAs(OutputType.FILE);
-		DateFormat dateFormat = new SimpleDateFormat("dd_MMM_yyyy__hh_mm_ssaa");
-		String destDir = "screenshots";
-		new File(destDir).mkdirs();
-		String destFile = testName + dateFormat.format(new Date()) + ".png";
-
 		try {
+			time = tr.getEndMillis() - tr.getStartMillis();
+			time = time / 1000;
+			String testName = null;
+			DateFormat dateFormat = new SimpleDateFormat(
+					"dd_MMM_yyyy__hh_mm_ssaa");
+			String destFile = null;
+			for (Map.Entry<String, String> entry : MyTestContext.getTestStats()
+					.entrySet()) {
+				testName = entry.getKey();
+				destFile = testName + "_" + dateFormat.format(new Date())
+						+ ".png";
+				String[] err = null;
+				err = tr.getThrowable().getMessage().split("\\n");
+				err[0] = err[0] + "\n. Screen shot saved at /screenshots/"
+						+ destFile;
+				testFailed.put(testName, new Object[] { entry.getValue(),
+						err[0], MyTestContext.getStep(), time });
+				t = entry.getKey();
+			}
+			addTestLogs(t);
+			MyTestContext.testStats.remove();
+			WebDriver driver = new Augmenter().augment(WebdriverManager
+					.getDriverInstance());
+			File scrFile = ((TakesScreenshot) driver)
+					.getScreenshotAs(OutputType.FILE);
+			String destDir = "screenshots";
+			new File(destDir).mkdirs();
 			FileUtils.copyFile(scrFile, new File(destDir + "/" + destFile));
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			StringWriter s = new StringWriter();
+			PrintWriter p = new PrintWriter(s, true);
+			e.printStackTrace(p);
+			log.error(s.getBuffer().toString());
+			Assert.fail("Check log file for error details");
 		}
-		addTestLogs("Screen shot saved at /screenshots/" + destFile);
 	}
 
 	@Override

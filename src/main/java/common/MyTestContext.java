@@ -39,7 +39,7 @@ public class MyTestContext {
 	static ThreadLocal<LinkedHashMap<String, String>> skipped = new ThreadLocal<LinkedHashMap<String, String>>();
 	static Parameters p = new Parameters();
 	static ThreadLocal<LinkedHashMap<String, String>> testStats = new ThreadLocal<LinkedHashMap<String, String>>();
-	static ThreadLocal<String> messages = new ThreadLocal<String>();
+	static ThreadLocal<StringBuilder> messages = new ThreadLocal<StringBuilder>();
 	private static ArrayList<String> step;
 	static ReadExcelData excelData;
 
@@ -47,7 +47,11 @@ public class MyTestContext {
 		String m = "";
 		m = m + "\n" + s;
 		log.info("Test Log : " + m);
-		messages.set(m);
+		if (messages.get() == null)
+			messages.set(new StringBuilder().append(s
+					+ System.getProperty("line.separator")));
+		else
+			messages.get().append(s + System.getProperty("line.separator"));
 	}
 
 	/**
@@ -55,7 +59,7 @@ public class MyTestContext {
 	 * 
 	 * @return
 	 */
-	public static String getMessages() {
+	public static StringBuilder getMessages() {
 		return messages.get();
 	}
 

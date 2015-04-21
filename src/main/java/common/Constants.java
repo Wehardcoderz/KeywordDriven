@@ -17,12 +17,15 @@
  * under the License.
  *******************************************************************************/
 package common;
+
 /**
  * 
  * @author Vishshady
  *
  */
+
 public interface Constants {
+
 	public static final String LOG4J_PATH = "src/main/java/resources/log4j.properties";
 	public static final String CONFIG_PATH = "src/main/java/resources/config.properties";
 	public static final String OBJECT_REPOSITORY_PATH = "src/main/java/resources/objectrepository.properties";
@@ -30,8 +33,8 @@ public interface Constants {
 	public static final String TEST_DESCRIPTION = "Test Description";
 	public static final String TEST_ENABLED = "Enabled";
 	public static final String TEST_SUITESHEET = "TestSuite";
-	public static final String HUB_URL = "http://localhost:4444/wd/hub";
-	public static final String CHROME_DRIVERPATH = "src/main/java/resources/chromedriver.exe";
+	public static final String CHROME_DRIVERPATH = "src/main/java/resources/chromedriver";
+	public static final String IE_DRIVERPATH = "src/main/java/resources/IEDriverServer.exe";
 	public static final String TESTCASE_DESCRIPTION = "Description";
 	public static final String TESTCASE_COMMAND = "Command";
 	public static final String TESTCASE_TARGET = "Target";

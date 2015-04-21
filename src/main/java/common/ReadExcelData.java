@@ -29,6 +29,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+
 /**
  * 
  * @author Vishshady
@@ -53,7 +54,7 @@ public class ReadExcelData {
 			System.exit(1);
 		}
 	}
-	
+
 	public ReadExcelData(Parameters p) {
 		try {
 			fileInputStream = new FileInputStream(p.getTestcasePath());
@@ -63,18 +64,18 @@ public class ReadExcelData {
 			System.exit(1);
 		}
 	}
-	
-	public String setSheet(int i){
+
+	public String setSheet(int i) {
 		this.sheetName = workbook.getSheetName(i);
 		return this.sheetName;
 	}
-	
-	public Boolean isSheetPresent(int index,String sheetName) {
+
+	public Boolean isSheetPresent(int index, String sheetName) {
 		boolean present = false;
-		present = workbook.getSheetAt(index).getSheetName().equalsIgnoreCase(sheetName);
+		present = workbook.getSheetAt(index).getSheetName()
+				.equalsIgnoreCase(sheetName);
 		return present;
 	}
-	
 
 	public int getRowNumber() {
 		int num = 0;
@@ -85,7 +86,7 @@ public class ReadExcelData {
 		}
 		return num;
 	}
-	
+
 	public int getSheetCount() {
 		return workbook.getNumberOfSheets();
 	}
@@ -152,30 +153,30 @@ public class ReadExcelData {
 		}
 		return null;
 	}
-	
+
 	public ArrayList<String> getColumnValue(String sheetName, String header) {
 		HSSFSheet sheet = workbook.getSheet(sheetName);
 		ArrayList<String> list = new ArrayList<String>();
 		int index = 0;
-		for(Row r : sheet) {
-			for(Cell c : r) {
+		for (Row r : sheet) {
+			for (Cell c : r) {
 				if (c.getCellType() != Cell.CELL_TYPE_NUMERIC)
-				if(c.getStringCellValue().equals(header))
-					index = c.getColumnIndex();
+					if (c.getStringCellValue().equals(header))
+						index = c.getColumnIndex();
 			}
 			list.add(r.getCell(index).getStringCellValue());
 		}
 		return list;
 	}
-	
+
 	public ArrayList<String> getRowValue(String sheetName, int row) {
 		HSSFSheet sheet = workbook.getSheet(sheetName);
 		ArrayList<String> list = new ArrayList<String>();
 		Row r = sheet.getRow(row);
-		for(Cell c: r) {
-			if(c.getCellType()==Cell.CELL_TYPE_STRING)
+		for (Cell c : r) {
+			if (c.getCellType() == Cell.CELL_TYPE_STRING)
 				list.add(c.getStringCellValue());
-			else if (c.getCellType()==Cell.CELL_TYPE_NUMERIC)
+			else if (c.getCellType() == Cell.CELL_TYPE_NUMERIC)
 				list.add(String.valueOf(c.getNumericCellValue()));
 		}
 		return list;
@@ -200,6 +201,9 @@ public class ReadExcelData {
 					case Cell.CELL_TYPE_STRING:
 						value = cell.getStringCellValue();
 						data.add(value);
+						break;
+					case Cell.CELL_TYPE_BOOLEAN:
+						data.add(String.valueOf(cell.getBooleanCellValue()));
 						break;
 					}
 				}
@@ -235,6 +239,9 @@ public class ReadExcelData {
 			case Cell.CELL_TYPE_STRING:
 				cellValue = cell.getStringCellValue();
 				break;
+			case Cell.CELL_TYPE_BOOLEAN:
+				cellValue = String.valueOf(cell.getBooleanCellValue());
+				break;
 			case Cell.CELL_TYPE_BLANK:
 				cellValue = null;
 			}
@@ -244,12 +251,12 @@ public class ReadExcelData {
 		return cellValue;
 	}
 
-//	public static void main(String[] args) throws IOException {
-//		Parameters p = new Parameters();
-//		ReadExcelData read = new ReadExcelData(p, "TestSuite");
-//	
-//		MyTestContext.checkExcel();
-//	
-//	}
+	// public static void main(String[] args) throws IOException {
+	// Parameters p = new Parameters();
+	// ReadExcelData read = new ReadExcelData(p, "TestSuite");
+	//
+	// MyTestContext.checkExcel();
+	//
+	// }
 
 }

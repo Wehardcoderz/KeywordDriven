@@ -22,59 +22,130 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.Assert;
-
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.safari.SafariDriver;
+import org.testng.Assert;
+
 /**
  * 
  * @author Vishshady
  *
  */
 public class WebdriverManager {
-	public static ThreadLocal<RemoteWebDriver> driverThread = new ThreadLocal<RemoteWebDriver>();
-	public static String browserType;
+	private static ThreadLocal<RemoteWebDriver> driverThread = new ThreadLocal<RemoteWebDriver>();
+	private static String browserType;
+	private static Parameters p = new Parameters();
 
 	public synchronized static void startDriver() {
 		RemoteWebDriver d = driverThread.get();
-		Parameters p = new Parameters();
 		if (d == null) {
 			if (p.getTestType().equals("local")) {
-				if (browserType.contains("firefox")) {
-					d = new FirefoxDriver();
-					driverThread.set(d);
-				} else if (browserType.contains("googlechrome")) {
-					System.setProperty("webdriver.chrome.driver",
-							Constants.CHROME_DRIVERPATH);
-					d = new ChromeDriver();
-					driverThread.set(d);
-				} else
+
+				switch (Browser.valueOf(browserType.toUpperCase())) {
+				case FIREFOX:
+					FirefoxProfile fp = new FirefoxProfile();
+					fp.setPreference("browser.privatebrowsing.autostart", true);
+					d = new FirefoxDriver(fp);
+					break;
+				case GOOGLECHROME:
+					if (System.getProperty("os.name").contains("windows"))
+						System.setProperty("webdriver.chrome.driver",
+								Constants.CHROME_DRIVERPATH + ".exe");
+					else
+						System.setProperty("webdriver.chrome.driver",
+								Constants.CHROME_DRIVERPATH);
+					ChromeOptions ch = new ChromeOptions();
+					ch.addArguments("--incognito");
+					d = new ChromeDriver(ch);
+					break;
+				case INTERNETEXPLORER:
+					System.setProperty("webdriver.ie.driver",
+							Constants.IE_DRIVERPATH);
+					d = new InternetExplorerDriver();
+					break;
+				case SAFARI:
+					Assert.assertTrue(isSupportedPlatform());
+					d = new SafariDriver();
+					break;
+				default:
 					Assert.fail("No browsers specified");
+					break;
+				}
+
 			} else if (p.getTestType().equals("grid")) {
-				DesiredCapabilities capabilities = DesiredCapabilities
-						.firefox();
-				capabilities.setBrowserName("firefox");
+				DesiredCapabilities capabilities = null;
+
+				switch (Browser.valueOf(browserType.toUpperCase())) {
+				case FIREFOX:
+					capabilities = DesiredCapabilities.firefox();
+					capabilities.setBrowserName("firefox");
+					FirefoxProfile fp = new FirefoxProfile();
+					fp.setPreference("browser.privatebrowsing.autostart", true);
+					capabilities.setCapability(FirefoxDriver.PROFILE, fp);
+					break;
+				case GOOGLECHROME:
+					if (System.getProperty("os.name").contains("windows"))
+						System.setProperty("webdriver.chrome.driver",
+								Constants.CHROME_DRIVERPATH + ".exe");
+					else
+						System.setProperty("webdriver.chrome.driver",
+								Constants.CHROME_DRIVERPATH);
+					capabilities = DesiredCapabilities.chrome();
+					capabilities.setBrowserName("googlechrome");
+					ChromeOptions ch = new ChromeOptions();
+					ch.addArguments("--incognito");
+					capabilities.setCapability(ChromeOptions.CAPABILITY, ch);
+					break;
+				case INTERNETEXPLORER:
+					System.setProperty("webdriver.ie.driver",
+							Constants.IE_DRIVERPATH);
+					capabilities = DesiredCapabilities.internetExplorer();
+					capabilities.setBrowserName("internetexplorer");
+					break;
+				case SAFARI:
+					Assert.assertTrue(isSupportedPlatform());
+					capabilities = DesiredCapabilities.safari();
+					capabilities.setBrowserName("safari");
+					break;
+				default:
+					Assert.fail("No browsers specified");
+					break;
+				}
+
 				capabilities = setPlatform(capabilities);
 				try {
-					d = new RemoteWebDriver(new URL(Constants.HUB_URL),
-							capabilities);
+					d = new RemoteWebDriver(new URL(p.getHub()), capabilities);
 					d.setFileDetector(new LocalFileDetector());
 				} catch (MalformedURLException e) {
 					e.printStackTrace();
 				}
 			}
-			d.get(p.getURL());
-			d.manage().window().maximize();
-			if (p.getImplicitWait() == 0)
-				d.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-			else
-				d.manage().timeouts()
-						.implicitlyWait(p.getImplicitWait(), TimeUnit.SECONDS);
 		}
+		driverThread.set(d);
+	}
+
+	private static boolean isSupportedPlatform() {
+		Platform current = Platform.getCurrent();
+		return Platform.MAC.is(current) || Platform.WINDOWS.is(current);
+	}
+
+	public static void loadHomePage() {
+		RemoteWebDriver d = driverThread.get();
+		d.get(p.getURL());
+		d.manage().window().maximize();
+		if (p.getImplicitWait() == 0)
+			d.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+		else
+			d.manage().timeouts()
+					.implicitlyWait(p.getImplicitWait(), TimeUnit.SECONDS);
 		driverThread.set(d);
 	}
 
@@ -104,5 +175,9 @@ public class WebdriverManager {
 		else if (platform.contains("linux"))
 			cap.setPlatform(Platform.LINUX);
 		return cap;
+	}
+
+	enum Browser {
+		FIREFOX, GOOGLECHROME, SAFARI, INTERNETEXPLORER
 	}
 }

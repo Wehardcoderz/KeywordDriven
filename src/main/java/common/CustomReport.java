@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -80,13 +81,11 @@ public class CustomReport implements Constants {
 	}
 
 	public void finishReport() throws IOException {
+		DateFormat dateFormat = new SimpleDateFormat("dd_MMM_yyyy__hh_mm_ssaa");
 		new File("SelenwordReports").mkdirs();
-		PrintWriter write = new PrintWriter(
-				new BufferedWriter(
-						new FileWriter(new File("SelenwordReports"
-								+ File.separator + suiteName + "_"
-								+ getDateAsString().replaceAll(("[/]"), "_")
-								+ ".html"))));
+		PrintWriter write = new PrintWriter(new BufferedWriter(new FileWriter(
+				new File("SelenwordReports" + File.separator + suiteName + "_"
+						+ dateFormat.format(new Date()) + ".html"))));
 		write.write(html.toHtml());
 		write.close();
 	}
@@ -111,7 +110,7 @@ public class CustomReport implements Constants {
 			LinkedHashMap<String, Object[]> testPassed,
 			LinkedHashMap<String, Object[]> testFailed,
 			LinkedHashMap<String, Object[]> testSkipped,
-			LinkedHashMap<String, String> testLogs) throws IOException {
+			LinkedHashMap<String, StringBuilder> testLogs) throws IOException {
 		int count = 1;
 		LinkedHashMap<String, Object[]> passed = testPassed;
 		LinkedHashMap<String, Object[]> failed = testFailed;
@@ -147,26 +146,36 @@ public class CustomReport implements Constants {
 					.td(class_("methodn")).a(href("#" + key)).write(key)._a()
 					._td().td().write(o[0].toString())._td().td()
 					.write("Falied Step : " + o[2].toString()).br()
-					.write("Reason : " + o[1].toString())._td().td()
+					.write("Debug Steps : " + o[1].toString())._td().td()
 					.write(o[3].toString())._td()._tr();
 		}
 
 		html._tbody()._table()._div();
-		messageCollector(testLogs);
+		if (testLogs != null)
+			messageCollector(testLogs);
 		html._body()._html();
 	}
 
-	public void messageCollector(LinkedHashMap<String, String> testLogs)
+	public void messageCollector(LinkedHashMap<String, StringBuilder> testLogs)
 			throws IOException {
-		LinkedHashMap<String, String> messages = testLogs;
+		LinkedHashMap<String, StringBuilder> messages = testLogs;
 		html.div(class_("summary")).h2().write("Test Logs")._h2();
-		Set<java.util.Map.Entry<String, String>> keyset = messages.entrySet();
-		for (java.util.Map.Entry<String, String> key : keyset) {
-			html.table(border("1")).tbody().tr(class_("tableHeader")).th()
-					.a(name(key.getKey())).write(key.getKey())._a()._th()._tr()
-					.tr().td().write(key.getValue())._td();
-			html._tr()._tbody()._table();
-		}
+		Set<java.util.Map.Entry<String, StringBuilder>> keyset = messages
+				.entrySet();
+		for (java.util.Map.Entry<String, StringBuilder> key : keyset) {
+			if (key.getValue() != null) {
+				html.table(border("1")).tbody().tr(class_("tableHeader")).th()
+						.a(name(key.getKey())).write(key.getKey())._a()._th()
+						._tr().tr().td();
+				String[] data = key.getValue().toString().split("\\n");
+				int line = 1;
+				for (String s : data) {
+					html.write(line++ + ". " + s).br();
+				}
+				html._td();
+				html._tr()._tbody()._table();
+			}
+			}
 		html._div();
 	}
 

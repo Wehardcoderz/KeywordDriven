@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="Failed suite [MySuite]" parallel="methods" data-provider-thread-count="1">
-  <test name="Default Test(failed)" parallel="methods">
+  <test name="Default Test(failed)" parallel="methods" preserve-order="false">
     <classes>
-      <class name="keywordutilities.TestDriver">
+      <class name="driver.TestDriver">
         <methods>
-          <include name="setUp"/>
-          <include name="test"/>
           <include name="tearDown"/>
+          <include name="test"/>
         </methods>
-      </class> <!-- keywordutilities.TestDriver -->
+      </class>
     </classes>
-  </test> <!-- Default Test(failed) -->
-</suite> <!-- Failed suite [MySuite] -->
+  </test>
+</suite>

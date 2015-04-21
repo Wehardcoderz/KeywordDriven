@@ -24,6 +24,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+
 /**
  * 
  * @author Vishshady
@@ -38,6 +39,7 @@ public class Parameters {
 	private int explicitWait = 0;
 	private int implicitWait = 0;
 	private String URL;
+	private String hub = null;
 	private String testType;
 	private static Logger log = Logger.getLogger(Parameters.class);
 
@@ -80,6 +82,7 @@ public class Parameters {
 		setImplicitWait(c.getInt("impWait"));
 		setURL(c.getString("URL"));
 		setTestType(c.getString("testType"));
+		setHub(c.getString("hub"));
 	}
 
 	void checkConfig() {
@@ -91,6 +94,11 @@ public class Parameters {
 				"testcasePath is null in config.properties file");
 		verifyNotNull(URL, "URL is null in config.properties file");
 		verifyNotNull(testType, "testType is null in config.properties file");
+		if (!(browsers.equalsIgnoreCase("googlechrome")
+				|| browsers.equalsIgnoreCase("firefox")
+				|| browsers.equalsIgnoreCase("internetexplorer") || browsers
+					.equalsIgnoreCase("safari")))
+			log.error("Any of the browser name should be specified : firefox/googlechrome/internetexplorer/safari");
 	}
 
 	void verifyNotNull(Object ob, String message) {
@@ -174,6 +182,14 @@ public class Parameters {
 
 	public void setTestType(String testType) {
 		this.testType = testType;
+	}
+
+	public String getHub() {
+		return hub;
+	}
+
+	public void setHub(String hub) {
+		this.hub = hub;
 	}
 
 }
