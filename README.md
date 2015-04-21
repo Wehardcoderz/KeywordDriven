@@ -40,7 +40,7 @@ TestCase Headers :
 
  - **SlNo** : Count in ascending order.
  - **Description** : Description of the test step.
- - **Command** : Keywords for the action you want to perform. For eg. click, type etc. Refer the list of keywords here.
+ - **Command** : Keywords for the action you want to perform. For eg. click, type etc. Refer the list of keywords [here](https://github.com/Wehardcoderz/Selenword/blob/master/doc/common/KeywordBase.html).
  - **Target** : Key for the Locator where action to be performed. keys are stored as Object Repository in key = Locator>value notation. For Eg. LoginButton = ID>vuforiaLogin. Object repository file is found [here](https://github.com/Wehardcoderz/Selenword/blob/master/src/main/java/resources/objectrepository.properties).
  - **Value** : Value to be passed on to the locator. For Eg. Enter text to text box, File location to upload files etc
  - **Index** : Index of an element. Sometimes page has more than one elements with the same locator and index of that element can be provided. By default index is "0" which means first returned element in the page.
@@ -62,8 +62,8 @@ Once all the configurations and test scripts are done, you can kick start your t
 
  - Open cmd/terminal and navigate to the folder where Selenword is downloaded.
  - Run this command "mvn clean compile exec:java -PSelenwordTest".
- - Report will be generated under "SelenwordReports" folder with the time stamp, host name, total passed, failed and skipped, total time taken and steps to debug if any test failed. kool right!
- - Still dint get where the failure is? you can see the screenshots at "screenshot" folder.
+ - Report will be generated under "SelenwordReports" folder with the time stamp, host name, total passed, failed and skipped, total time taken and steps to debug if any test failed. kool right! Here is the [SampleReport](https://github.com/Wehardcoderz/Selenword/blob/master/SampleReport/MySuite_21_Apr_2015__09_04_36PM.html).
+ - Still dint get where the failure is? you can see the screenshots at "screenshots" folder.
 
 
 ----------
