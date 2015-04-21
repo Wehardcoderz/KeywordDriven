@@ -1,62 +1,148 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en-us">
   <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="description" content="Selenword : A single framework for all types of keyword tests.">
-
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>Selenword</title>
+    <meta charset="UTF-8">
+    <title>Selenword by Wehardcoderz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
-
   <body>
+    <section class="page-header">
+      <h1 class="project-name">Selenword</h1>
+      <h2 class="project-tagline">A Keyword Driven Framework</h2>
+      <a href="https://github.com/Wehardcoderz/Selenword" class="btn">View on GitHub</a>
+      <a href="https://github.com/Wehardcoderz/Selenword/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/Wehardcoderz/Selenword/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/Wehardcoderz/Selenword">View on GitHub</a>
+    <section class="main-content">
+      <h2>
+<a id="selenword--keydriven-framework-using-selenium" class="anchor" href="#selenword--keydriven-framework-using-selenium" aria-hidden="true"><span class="octicon octicon-link"></span></a>Selenword : Keydriven framework using selenium</h2>
 
-          <h1 id="project_title">Selenword</h1>
-          <h2 id="project_tagline">A single framework for all types of keyword tests.</h2>
+<p>Selenword is divided into three parts :</p>
 
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/Wehardcoderz/Selenword/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/Wehardcoderz/Selenword/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
+<ol>
+<li>Test Scripts: Test scripts are stored in excel sheet in .xls format.</li>
+<li>Test Driver: Test scripts are triggered using Java and TestNG class.</li>
+<li>Report : Test report is generated after the execution of all tests. </li>
+</ol>
 
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <p>Keydriven framework using selenium</p>
+<h4>
+<a id="features-" class="anchor" href="#features-" aria-hidden="true"><span class="octicon octicon-link"></span></a>
+<strong>Features</strong> :</h4>
 
-<p>Framework divided into three parts :
-1. Test steps (excel)
-2. Test Driver
-3. Keywords</p>
+<ul>
+<li>Create an automated test scripts with the knowledge of keywords and HTML locators.</li>
+<li>Supported browsers : Firefox, GoogleChrome, Internet Explorer and Safari.</li>
+<li>Supports Multi-Threaded execution over remote machines or local.</li>
+<li>HTML report with timestamp, execution time, host name and steps to debug for any failed tests.</li>
+<li>Screenshots for failed tests.</li>
+</ul>
 
-<p>WIP on generating the reports on multiple tests.</p>
+<h4>
+<a id="pre---requisites" class="anchor" href="#pre---requisites" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Pre - Requisites</strong>
+</h4>
 
-<p>Future Releases :
-Multithreaded execution over grid.</p>
+<ul>
+<li>JDK 1.6 or higher</li>
+<li>Maven 3.3.1 or higher</li>
+<li>xls format editor.</li>
+</ul>
+
+<h4>
+<a id="preparation-test-suite-and-test-cases" class="anchor" href="#preparation-test-suite-and-test-cases" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Preparation Test Suite and Test Cases</strong>
+</h4>
+
+<p>Sample excel can be found <a href="https://github.com/Wehardcoderz/Selenword/blob/master/TestCase.xls">here</a>.</p>
+
+<ul>
+<li>First sheet is the test suite where all details of the test cases are listed.</li>
+<li>We call first sheet as "TestSuite" and name should remain unchanged.</li>
+<li>Test cases listed under "TestName" column should have a sheet name in the same name for easier mapping of test suite with test cases.</li>
+</ul>
+
+<p>TestSuite Headers :</p>
+
+<ul>
+<li>
+<strong>SlNo</strong> : Count in ascending order.</li>
+<li>
+<strong>TestName</strong> : Test case name which has to be included in the test suite.</li>
+<li>
+<strong>Test Description</strong> : Description of the test case.</li>
+<li>
+<strong>Enabled</strong> : Exclude test case as part of regression if set to "False". By default it is taken as "True". </li>
+</ul>
+
+<p>TestCase Headers :</p>
+
+<ul>
+<li>
+<strong>SlNo</strong> : Count in ascending order.</li>
+<li>
+<strong>Description</strong> : Description of the test step.</li>
+<li>
+<strong>Command</strong> : Keywords for the action you want to perform. For eg. click, type etc. Refer the list of keywords <a href="https://github.com/Wehardcoderz/Selenword/blob/master/doc/common/KeywordBase.html">here</a>.</li>
+<li>
+<strong>Target</strong> : Key for the Locator where action to be performed. keys are stored as Object Repository in key = Locator&gt;value notation. For Eg. LoginButton = ID&gt;vuforiaLogin. Object repository file is found <a href="https://github.com/Wehardcoderz/Selenword/blob/master/src/main/java/resources/objectrepository.properties">here</a>.</li>
+<li>
+<strong>Value</strong> : Value to be passed on to the locator. For Eg. Enter text to text box, File location to upload files etc</li>
+<li>
+<strong>Index</strong> : Index of an element. Sometimes page has more than one elements with the same locator and index of that element can be provided. By default index is "0" which means first returned element in the page.</li>
+</ul>
+
+<h4>
+<a id="setting-up-test-suite-run-properties" class="anchor" href="#setting-up-test-suite-run-properties" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Setting up test suite run properties</strong>
+</h4>
+
+<p>Make sure config.properties file is filled with all the details required to execute regression. config.properties file is found <a href="https://github.com/Wehardcoderz/Selenword/blob/master/src/main/java/resources/config.properties">here</a>.</p>
+
+<p>You need to put the chrome and internet explorer driver into resource folder. </p>
+
+<ul>
+<li>For any information on Internet Explorer Driver, click <a href="https://code.google.com/p/selenium/wiki/InternetExplorerDriver">here</a>
+</li>
+<li>For any information on Chrome Driver, click <a href="https://code.google.com/p/selenium/wiki/ChromeDriver">here</a>.</li>
+<li>For any information on Safari Driver, click <a href="https://code.google.com/p/selenium/wiki/SafariDriver">here</a>.</li>
+<li>For any information on Opera Driver, click <a href="https://code.google.com/p/selenium/wiki/OperaDriver">here</a>.</li>
+</ul>
+
+<h4>
+<a id="running-your-selenword-test" class="anchor" href="#running-your-selenword-test" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Running your Selenword Test</strong>
+</h4>
+
+<p>Once all the configurations and test scripts are done, you can kick start your test suite run. Here is how</p>
+
+<ul>
+<li>Open cmd/terminal and navigate to the folder where Selenword is downloaded.</li>
+<li>Run this command "mvn clean compile exec:java -PSelenwordTest".</li>
+<li>Report will be generated under "SelenwordReports" folder with the time stamp, host name, total passed, failed and skipped, total time taken and steps to debug if any test failed. kool right! Here is the <a href="https://github.com/Wehardcoderz/Selenword/blob/master/SampleReport/MySuite_21_Apr_2015__09_04_36PM.html">SampleReport</a>.</li>
+<li>Still dint get where the failure is? you can see the screenshots at "screenshots" folder.</li>
+</ul>
+
+<hr>
+
+<h4>
+<a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Contributing</strong>
+</h4>
+
+<p>See <a href="https://github.com/Wehardcoderz/Selenword/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> for info on working on Selenword and sending patches.</p>
 
 <p>Contact 
 E : <a href="mailto:vish.shady@gmail.com">vish.shady@gmail.com</a></p>
-      </section>
-    </div>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Selenword maintained by <a href="https://github.com/Wehardcoderz">Wehardcoderz</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/Wehardcoderz/Selenword">Selenword</a> is maintained by <a href="https://github.com/Wehardcoderz">Wehardcoderz</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
-    </div>
 
-              <script type="text/javascript">
+    </section>
+
+            <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
@@ -67,6 +153,6 @@ E : <a href="mailto:vish.shady@gmail.com">vish.shady@gmail.com</a></p>
             } catch(err) {}
           </script>
 
-
   </body>
 </html>
+
