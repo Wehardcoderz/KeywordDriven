@@ -18,7 +18,7 @@ Selenword is divided into three parts :
 #### **Pre - Requisites** ##
 
  - JDK 1.6 or higher
- - Maven 3.3.1 or higher
+ - Maven. Maven download for your Java version is found [here](https://maven.apache.org/download.cgi). 
  - xls format editor.
 
 #### **Preparation Test Suite and Test Cases** ##
