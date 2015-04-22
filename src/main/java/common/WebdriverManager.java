@@ -37,7 +37,7 @@ import org.testng.Assert;
 /**
  * 
  * @author Vishshady
- *
+ * 
  */
 public class WebdriverManager {
 	private static ThreadLocal<RemoteWebDriver> driverThread = new ThreadLocal<RemoteWebDriver>();
@@ -52,23 +52,21 @@ public class WebdriverManager {
 				switch (Browser.valueOf(browserType.toUpperCase())) {
 				case FIREFOX:
 					FirefoxProfile fp = new FirefoxProfile();
-					fp.setPreference("browser.privatebrowsing.autostart", true);
+					fp.setPreference("browser.private.browsing.autostart", true);
 					d = new FirefoxDriver(fp);
 					break;
 				case GOOGLECHROME:
 					if (System.getProperty("os.name").contains("windows"))
-						System.setProperty("webdriver.chrome.driver",
-								Constants.CHROME_DRIVERPATH + ".exe");
+						System.setProperty("webdriver.chrome.driver", Constants.CHROME_DRIVERPATH + ".exe");
 					else
-						System.setProperty("webdriver.chrome.driver",
-								Constants.CHROME_DRIVERPATH);
+						System.setProperty("webdriver.chrome.driver", Constants.CHROME_DRIVERPATH);
 					ChromeOptions ch = new ChromeOptions();
 					ch.addArguments("--incognito");
+					ch.addArguments("start-maximized");
 					d = new ChromeDriver(ch);
 					break;
 				case INTERNETEXPLORER:
-					System.setProperty("webdriver.ie.driver",
-							Constants.IE_DRIVERPATH);
+					System.setProperty("webdriver.ie.driver", Constants.IE_DRIVERPATH);
 					d = new InternetExplorerDriver();
 					break;
 				case SAFARI:
@@ -93,20 +91,18 @@ public class WebdriverManager {
 					break;
 				case GOOGLECHROME:
 					if (System.getProperty("os.name").contains("windows"))
-						System.setProperty("webdriver.chrome.driver",
-								Constants.CHROME_DRIVERPATH + ".exe");
+						System.setProperty("webdriver.chrome.driver", Constants.CHROME_DRIVERPATH + ".exe");
 					else
-						System.setProperty("webdriver.chrome.driver",
-								Constants.CHROME_DRIVERPATH);
+						System.setProperty("webdriver.chrome.driver", Constants.CHROME_DRIVERPATH);
 					capabilities = DesiredCapabilities.chrome();
 					capabilities.setBrowserName("googlechrome");
 					ChromeOptions ch = new ChromeOptions();
 					ch.addArguments("--incognito");
+					ch.addArguments("start-maximized");
 					capabilities.setCapability(ChromeOptions.CAPABILITY, ch);
 					break;
 				case INTERNETEXPLORER:
-					System.setProperty("webdriver.ie.driver",
-							Constants.IE_DRIVERPATH);
+					System.setProperty("webdriver.ie.driver", Constants.IE_DRIVERPATH);
 					capabilities = DesiredCapabilities.internetExplorer();
 					capabilities.setBrowserName("internetexplorer");
 					break;
@@ -144,8 +140,7 @@ public class WebdriverManager {
 		if (p.getImplicitWait() == 0)
 			d.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 		else
-			d.manage().timeouts()
-					.implicitlyWait(p.getImplicitWait(), TimeUnit.SECONDS);
+			d.manage().timeouts().implicitlyWait(p.getImplicitWait(), TimeUnit.SECONDS);
 		driverThread.set(d);
 	}
 
@@ -159,8 +154,12 @@ public class WebdriverManager {
 
 	public static void stopDriver() {
 		if (!(WebdriverManager.getDriverInstance() == null)) {
-			WebdriverManager.getDriverInstance().quit();
-			driverThread.set(null);
+			try {
+				WebdriverManager.getDriverInstance().quit();
+				driverThread.set(null);
+			} catch (Exception e) {
+				driverThread.set(null);
+			}
 		}
 	}
 
