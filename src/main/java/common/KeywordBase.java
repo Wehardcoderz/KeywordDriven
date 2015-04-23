@@ -221,7 +221,7 @@ public class KeywordBase implements Constants {
 		log.info("Typing " + value);
 		WebElement e = getElement(locator, index);
 		e.clear();
-		e.sendKeys(value);
+		e.sendKeys(getString(value));
 	}
 
 	/**
@@ -271,7 +271,7 @@ public class KeywordBase implements Constants {
 		log.info("Select by value " + locator + " value " + value);
 		WebElement e = getElement(locator, index);
 		Select select = new Select(e);
-		select.selectByValue(value);
+		select.selectByValue(getString(value));
 	}
 
 	/**
@@ -289,7 +289,7 @@ public class KeywordBase implements Constants {
 		log.info("Select by text " + locator + " value " + value);
 		WebElement e = getElement(locator, index);
 		Select select = new Select(e);
-		select.selectByVisibleText(value);
+		select.selectByVisibleText(getString(value));
 	}
 
 	/**
@@ -315,7 +315,7 @@ public class KeywordBase implements Constants {
 	 */
 	public static void executeScript(String value) {
 		JavascriptExecutor js = (JavascriptExecutor) d;
-		js.executeScript(value);
+		js.executeScript(getString(value));
 	}
 
 	/**
@@ -391,7 +391,7 @@ public class KeywordBase implements Constants {
 	public static void switchFrameByValue(String frameValue) {
 		log.info("Switching to frame " + frameValue);
 		d.switchTo().defaultContent();
-		d.switchTo().frame(frameValue);
+		d.switchTo().frame(getString(frameValue));
 	}
 
 	/**
@@ -593,7 +593,7 @@ public class KeywordBase implements Constants {
 	 *            Title of the page.
 	 */
 	public static void waitForElementByTitle(String title) {
-		wait.until(ExpectedConditions.titleContains(title));
+		wait.until(ExpectedConditions.titleContains(getString(title)));
 	}
 
 	/**
@@ -633,12 +633,12 @@ public class KeywordBase implements Constants {
 	public static void assertText(String locator, String text, String... index) {
 		log.info("Assert by Text " + locator + " text " + text);
 
-		if (splitValueMsg(text).length == 1)
+		if (splitValueMsg(getString(text)).length == 1)
 			Assert.assertEquals(getElement(locator, index).getText(),
-					splitValueMsg(text)[0]);
+					getString(splitValueMsg(text)[0]));
 		else
 			Assert.assertEquals(getElement(locator, index).getText(),
-					splitValueMsg(text)[0], splitValueMsg(text)[1]);
+					getString(splitValueMsg(text)[0]), splitValueMsg(text)[1]);
 	}
 
 	/**
@@ -660,10 +660,10 @@ public class KeywordBase implements Constants {
 
 		if (splitValueMsg(value).length == 1)
 			Assert.assertEquals(getElement(locator, index)
-					.getAttribute("value"), splitValueMsg(value)[0]);
+					.getAttribute("value"), getString(splitValueMsg(value)[0]));
 		else
 			Assert.assertEquals(getElement(locator, index).getText(),
-					splitValueMsg(value)[0], splitValueMsg(value)[1]);
+					getString(splitValueMsg(value)[0]), splitValueMsg(value)[1]);
 
 	}
 
@@ -678,10 +678,11 @@ public class KeywordBase implements Constants {
 		log.info("Assert by title " + title);
 
 		if (splitValueMsg(title).length == 1)
-			Assert.assertEquals(d.getTitle(), splitValueMsg(title)[0]);
+			Assert.assertEquals(d.getTitle(),
+					getString(splitValueMsg(title)[0]));
 		else
-			Assert.assertEquals(d.getTitle(), splitValueMsg(title)[0],
-					splitValueMsg(title)[1]);
+			Assert.assertEquals(d.getTitle(),
+					getString(splitValueMsg(title)[0]), splitValueMsg(title)[1]);
 
 	}
 
@@ -704,10 +705,10 @@ public class KeywordBase implements Constants {
 
 		if (splitValueMsg(bool).length == 1)
 			Assert.assertEquals(getElement(locator, index).isDisplayed(),
-					Boolean.parseBoolean(splitValueMsg(bool)[0]));
+					Boolean.parseBoolean(getString(splitValueMsg(bool)[0])));
 		else
 			Assert.assertEquals(getElement(locator, index).isDisplayed(),
-					Boolean.parseBoolean(splitValueMsg(bool)[0]),
+					Boolean.parseBoolean(getString(splitValueMsg(bool)[0])),
 					splitValueMsg(bool)[1]);
 	}
 
@@ -730,10 +731,10 @@ public class KeywordBase implements Constants {
 
 		if (splitValueMsg(bool).length == 1)
 			Assert.assertEquals(getElement(locator, index).isSelected(),
-					Boolean.parseBoolean(splitValueMsg(bool)[0]));
+					Boolean.parseBoolean(getString(splitValueMsg(bool)[0])));
 		else
 			Assert.assertEquals(getElement(locator, index).isSelected(),
-					Boolean.parseBoolean(splitValueMsg(bool)[0]),
+					Boolean.parseBoolean(getString(splitValueMsg(bool)[0])),
 					splitValueMsg(bool)[1]);
 
 	}
@@ -758,12 +759,11 @@ public class KeywordBase implements Constants {
 		if (splitValueMsg(option).length == 1) {
 			Select s = new Select(getElement(locator, index));
 			Assert.assertEquals(s.getFirstSelectedOption().getText(),
-					splitValueMsg(option)[0]);
+					getString(splitValueMsg(option)[0]));
 		} else
 			Assert.assertEquals(getElement(locator, index).getText(),
-					splitValueMsg(option)[0], splitValueMsg(option)[1]);
+					getString(splitValueMsg(option)[0]),
+					splitValueMsg(option)[1]);
 	}
-
-	/********************** JSOUP Functions under construction ******************************/
 
 }
