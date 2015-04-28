@@ -5,11 +5,11 @@ Selenword is divided into three parts :
 
 1. Test Scripts: Test scripts are stored in excel sheet in .xls format.
 2. Test Driver: Test scripts are triggered using Java and TestNG class.
-3. Report : Test report is generated after the execution of all tests. 
+3. Report : [Test report](https://docs.google.com/file/d/0BzuC23k8-dcqUDlQSTNOY3V5LUE/edit?pli=1) is generated after the execution of all tests. 
 
 #### **Features** : #
 
- - Create an automated test scripts with the knowledge of keywords and HTML locators.
+ - Create an automated test scripts with the knowledge of [keywords](https://drive.google.com/file/d/0BzuC23k8-dcqTTN1b0VPQ3k1a1U/view?pli=1) and HTML locators.
  - Supported browsers : Firefox, GoogleChrome, Internet Explorer and Safari.
  - Supports Multi-Threaded execution over remote machines or local.
  - HTML report with timestamp, execution time, host name and steps to debug for any failed tests.
