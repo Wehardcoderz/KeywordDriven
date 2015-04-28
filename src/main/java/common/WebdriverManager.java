@@ -152,13 +152,13 @@ public class WebdriverManager {
 		browserType = browser;
 	}
 
-	public static void stopDriver() {
+public static void stopDriver() {
 		if (!(WebdriverManager.getDriverInstance() == null)) {
 			try {
+				WebdriverManager.getDriverInstance().close();
 				WebdriverManager.getDriverInstance().quit();
-				driverThread.set(null);
 			} catch (Exception e) {
-				driverThread.set(null);
+				WebdriverManager.getDriverInstance().quit();
 			}
 		}
 	}
