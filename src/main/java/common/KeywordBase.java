@@ -21,6 +21,8 @@ package common;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -39,7 +41,7 @@ import org.testng.Assert;
 
 import common.Constants;
 import common.Parameters;
-import common.WebdriverManager;
+import common.IDriver;
 
 /**
  * Keyword base which has all basic keywords required for automation
@@ -47,12 +49,11 @@ import common.WebdriverManager;
  * @author Vishshady
  *
  */
-public class KeywordBase implements Constants {
-	private static int expTime = 0;
-	private static Properties OR;
-	private static Logger log = Logger.getLogger(KeywordBase.class);
-	private static RemoteWebDriver d;
-	private static WebDriverWait wait;
+public class KeywordBase implements Constants, IDriver {
+	private int expTime = 0;
+	private Properties OR;
+	private Logger log = Logger.getLogger(KeywordBase.class);
+	private WebDriverWait wait;
 
 	/**
 	 * @param d
@@ -60,24 +61,17 @@ public class KeywordBase implements Constants {
 	 */
 	public KeywordBase(Parameters p) {
 		initOR();
-		startDriver();
-		d = WebdriverManager.getDriverInstance();
-		wait = new WebDriverWait(d, 30);
+		wait = new WebDriverWait(driver(), 30);
 		if (p.getExplicitWait() == 0)
 			expTime = 30;
 		else
 			expTime = p.getExplicitWait();
 	}
 
-	private static void startDriver() {
-		WebdriverManager.startDriver();
-		WebdriverManager.loadHomePage();
-	}
-
 	/**
 	 * 
 	 */
-	private static void initOR() {
+	private synchronized void initOR() {
 		String file = new File(OBJECT_REPOSITORY_PATH).getAbsolutePath();
 
 		try {
@@ -94,7 +88,7 @@ public class KeywordBase implements Constants {
 	 *            HTML element locator from Object Repository file.
 	 * @return
 	 */
-	private static By getBy(String locator) {
+	private synchronized By getBy(String locator) {
 		By by = null;
 		String locType = null;
 		String[] a = null;
@@ -144,17 +138,23 @@ public class KeywordBase implements Constants {
 	 *            element present in HTML. 0 by default.
 	 * @return
 	 */
-	private static WebElement getElement(String locator, String... index) {
+	private synchronized WebElement getElement(String locator, String... index) {
 		WebElement element = null;
 
 		try {
 			By by = getBy(locator);
 			if (index.length != 0)
-				element = d.findElements(by).get(Integer.parseInt(index[0]));
+				element = driver().findElements(by).get(
+						Integer.parseInt(index[0]));
 			else
-				element = d.findElement(by);
+				element = driver().findElement(by);
 		} catch (NullPointerException n) {
 			log.error("NullPointerException for : " + locator);
+			StringWriter s = new StringWriter();
+			PrintWriter p = new PrintWriter(s, true);
+			n.printStackTrace(p);
+			log.error(s.getBuffer().toString());
+			Assert.fail("1. Check test case step for errors 2. Make sure valid keyword and arguments are passed");
 		}
 
 		return element;
@@ -166,7 +166,7 @@ public class KeywordBase implements Constants {
 	 *            HTML element locator from Object Repository file.
 	 * @return
 	 */
-	private static By getElementBy(String locator) {
+	private synchronized By getElementBy(String locator) {
 		By by = null;
 
 		try {
@@ -187,7 +187,7 @@ public class KeywordBase implements Constants {
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
 	 */
-	public static void click(String locator, String... index) {
+	public synchronized void click(String locator, String... index) {
 		log.info("Clicking on " + locator);
 		getElement(locator, index).click();
 	}
@@ -201,7 +201,7 @@ public class KeywordBase implements Constants {
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
 	 */
-	public static void clickj(String locator, String... index) {
+	public synchronized void clickj(String locator, String... index) {
 		log.info("Clicking on " + locator);
 		executeScript("arguments[0].click();", locator, index);
 	}
@@ -217,7 +217,7 @@ public class KeywordBase implements Constants {
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
 	 */
-	public static void type(String locator, String value, String... index) {
+	public synchronized void type(String locator, String value, String... index) {
 		log.info("Typing " + value);
 		WebElement e = getElement(locator, index);
 		e.clear();
@@ -233,7 +233,7 @@ public class KeywordBase implements Constants {
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
 	 */
-	public static void clear(String locator, String... index) {
+	public synchronized void clear(String locator, String... index) {
 		getElement(locator, index).clear();
 	}
 
@@ -248,7 +248,7 @@ public class KeywordBase implements Constants {
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
 	 */
-	public static void selectIndex(String locator, int i, String... index) {
+	public synchronized void selectIndex(String locator, int i, String... index) {
 		log.info("Select by index " + locator);
 		WebElement e = getElement(locator, index);
 		Select select = new Select(e);
@@ -266,7 +266,7 @@ public class KeywordBase implements Constants {
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
 	 */
-	public static void selectValue(String locator, String value,
+	public synchronized void selectValue(String locator, String value,
 			String... index) {
 		log.info("Select by value " + locator + " value " + value);
 		WebElement e = getElement(locator, index);
@@ -285,7 +285,8 @@ public class KeywordBase implements Constants {
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
 	 */
-	public static void selectText(String locator, String value, String... index) {
+	public synchronized void selectText(String locator, String value,
+			String... index) {
 		log.info("Select by text " + locator + " value " + value);
 		WebElement e = getElement(locator, index);
 		Select select = new Select(e);
@@ -295,17 +296,9 @@ public class KeywordBase implements Constants {
 	/**
 	 * Close browser window
 	 */
-	public static void close() {
+	public synchronized void close() {
 		log.info("Close browser window");
-		d.close();
-	}
-
-	/**
-	 * To stop the driver
-	 */
-	@SuppressWarnings("unused")
-	private static void stopDriver() {
-		WebdriverManager.stopDriver();
+		driver().close();
 	}
 
 	/**
@@ -313,8 +306,8 @@ public class KeywordBase implements Constants {
 	 * 
 	 * @param value
 	 */
-	public static void executeScript(String value) {
-		JavascriptExecutor js = (JavascriptExecutor) d;
+	public synchronized void executeScript(String value) {
+		JavascriptExecutor js = (JavascriptExecutor) driver();
 		js.executeScript(getString(value));
 	}
 
@@ -329,9 +322,9 @@ public class KeywordBase implements Constants {
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
 	 */
-	public static void executeScript(String value, String locator,
+	public synchronized void executeScript(String value, String locator,
 			String... index) {
-		JavascriptExecutor js = (JavascriptExecutor) d;
+		JavascriptExecutor js = (JavascriptExecutor) driver();
 		js.executeScript(value, getElement(locator, index));
 	}
 
@@ -340,7 +333,7 @@ public class KeywordBase implements Constants {
 	 * 
 	 * @param message
 	 */
-	public static void log(String message) {
+	public synchronized void log(String message) {
 		MyTestContext.setMessage(getString(message));
 	}
 
@@ -356,12 +349,13 @@ public class KeywordBase implements Constants {
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
 	 */
-	public static void getText(String locator, String var, String... index) {
+	public synchronized void getText(String locator, String var,
+			String... index) {
 		String text = getElement(locator, index).getText();
 		VariableStorage.setVar(var, text);
 	}
 
-	private static String getString(String key) {
+	private synchronized String getString(String key) {
 		String s = key;
 		if (key.substring(0, 1).contains("$")) {
 			s = key.substring(1);
@@ -377,10 +371,10 @@ public class KeywordBase implements Constants {
 	 * 
 	 * @param frameIndex
 	 */
-	public static void switchFrameByIndex(String frameIndex) {
+	public synchronized void switchFrameByIndex(String frameIndex) {
 		log.info("Switching to frame " + frameIndex);
-		d.switchTo().defaultContent();
-		d.switchTo().frame(Integer.parseInt(frameIndex));
+		driver().switchTo().defaultContent();
+		driver().switchTo().frame(Integer.parseInt(frameIndex));
 	}
 
 	/**
@@ -388,10 +382,10 @@ public class KeywordBase implements Constants {
 	 * 
 	 * @param frameValue
 	 */
-	public static void switchFrameByValue(String frameValue) {
+	public synchronized void switchFrameByValue(String frameValue) {
 		log.info("Switching to frame " + frameValue);
-		d.switchTo().defaultContent();
-		d.switchTo().frame(getString(frameValue));
+		driver().switchTo().defaultContent();
+		driver().switchTo().frame(getString(frameValue));
 	}
 
 	/**
@@ -400,34 +394,34 @@ public class KeywordBase implements Constants {
 	 * @param locator
 	 *            HTML element locator from Object Repository file.
 	 */
-	public static void switchFrame(String locator) {
+	public synchronized void switchFrame(String locator) {
 		log.info("Switching to frame " + locator);
-		d.switchTo().defaultContent();
-		d.switchTo().frame(getElement(locator));
+		driver().switchTo().defaultContent();
+		driver().switchTo().frame(getElement(locator));
 	}
 
 	/**
 	 * Switch to new window opened
 	 */
-	public static void switchWindow() {
-		for (String window : d.getWindowHandles()) {
+	public synchronized void switchWindow() {
+		for (String window : driver().getWindowHandles()) {
 			log.info("switching to window " + window);
-			d.switchTo().window(window);
+			driver().switchTo().window(window);
 		}
 	}
 
 	/**
 	 * Switch to default iFrame or Window
 	 */
-	public static void SwitchDefaultContent() {
+	public synchronized void SwitchDefaultContent() {
 		log.info("Switching to defaultContent");
-		d.switchTo().defaultContent();
+		driver().switchTo().defaultContent();
 	}
 
-	private static Alert isAlertPresent() {
+	private synchronized Alert isAlertPresent() {
 		Alert a = null;
 		try {
-			a = d.switchTo().alert();
+			a = driver().switchTo().alert();
 		} catch (NoAlertPresentException e) {
 			log.error(e);
 			Assert.fail(e + " Assert not present");
@@ -438,7 +432,7 @@ public class KeywordBase implements Constants {
 	/**
 	 * Accept if alert is present
 	 */
-	public static void acceptAlert() {
+	public synchronized void acceptAlert() {
 		Alert a = isAlertPresent();
 		log.info("Accepting an alert");
 		a.accept();
@@ -447,7 +441,7 @@ public class KeywordBase implements Constants {
 	/**
 	 * Dismiss if alert is present
 	 */
-	public static void declineAlert() {
+	public synchronized void declineAlert() {
 		Alert a = isAlertPresent();
 		log.info("Dismissing an alert");
 		a.dismiss();
@@ -466,11 +460,11 @@ public class KeywordBase implements Constants {
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
 	 */
-	public static void waitForElementEnabled(final String locator, String time,
-			final String... index) {
+	public synchronized void waitForElementEnabled(final String locator,
+			String time, final String... index) {
 		log.info("customWaitForElementEnabled for time " + time);
 
-		(new WebDriverWait(d, Integer.parseInt(time)))
+		(new WebDriverWait(driver(), Integer.parseInt(time)))
 				.until(new ExpectedCondition<Boolean>() {
 					public Boolean apply(WebDriver d) {
 						return (getElement(locator, index)).isEnabled();
@@ -487,15 +481,16 @@ public class KeywordBase implements Constants {
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
 	 */
-	public static void waitForElementEnabled(final String locator,
+	public synchronized void waitForElementEnabled(final String locator,
 			final String... index) {
 		log.info("customWaitForElementEnabled for time " + expTime);
 
-		(new WebDriverWait(d, expTime)).until(new ExpectedCondition<Boolean>() {
-			public Boolean apply(WebDriver d) {
-				return (getElement(locator, index)).isEnabled();
-			}
-		});
+		(new WebDriverWait(driver(), expTime))
+				.until(new ExpectedCondition<Boolean>() {
+					public Boolean apply(WebDriver d) {
+						return (getElement(locator, index)).isEnabled();
+					}
+				});
 	}
 
 	/**
@@ -509,11 +504,11 @@ public class KeywordBase implements Constants {
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
 	 */
-	public static void waitForElementBy(final String locator, String time,
-			final String... index) {
+	public synchronized void waitForElementBy(final String locator,
+			String time, final String... index) {
 		log.info("waitForElement for time " + time);
 
-		(new WebDriverWait(d, Integer.parseInt(time)))
+		(new WebDriverWait(driver(), Integer.parseInt(time)))
 				.until(new ExpectedCondition<WebElement>() {
 					public WebElement apply(WebDriver d) {
 						return getElement(locator, index);
@@ -530,11 +525,11 @@ public class KeywordBase implements Constants {
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
 	 */
-	public static void waitForElement(final String locator,
+	public synchronized void waitForElement(final String locator,
 			final String... index) {
 		log.info("waitForElement for time " + expTime);
 
-		(new WebDriverWait(d, expTime))
+		(new WebDriverWait(driver(), expTime))
 				.until(new ExpectedCondition<WebElement>() {
 					public WebElement apply(WebDriver d) {
 						return getElement(locator, index);
@@ -554,11 +549,11 @@ public class KeywordBase implements Constants {
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
 	 */
-	public static void waitForElementDisplayedBy(final String locator,
+	public synchronized void waitForElementDisplayedBy(final String locator,
 			String time, final String... index) {
 		log.info("waitForElementByDisplayed " + time);
 
-		(new WebDriverWait(d, Integer.parseInt(time)))
+		(new WebDriverWait(driver(), Integer.parseInt(time)))
 				.until(new ExpectedCondition<Boolean>() {
 					public Boolean apply(WebDriver d) {
 						return getElement(locator, index).isDisplayed();
@@ -575,15 +570,16 @@ public class KeywordBase implements Constants {
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
 	 */
-	public static void waitForElementDisplayed(final String locator,
+	public synchronized void waitForElementDisplayed(final String locator,
 			final String... index) {
 		log.info("waitForElementByDisplayed " + expTime);
 
-		(new WebDriverWait(d, expTime)).until(new ExpectedCondition<Boolean>() {
-			public Boolean apply(WebDriver d) {
-				return getElement(locator, index).isDisplayed();
-			}
-		});
+		(new WebDriverWait(driver(), expTime))
+				.until(new ExpectedCondition<Boolean>() {
+					public Boolean apply(WebDriver d) {
+						return getElement(locator, index).isDisplayed();
+					}
+				});
 	}
 
 	/**
@@ -592,7 +588,7 @@ public class KeywordBase implements Constants {
 	 * @param title
 	 *            Title of the page.
 	 */
-	public static void waitForElementByTitle(String title) {
+	public synchronized void waitForElementByTitle(String title) {
 		wait.until(ExpectedConditions.titleContains(getString(title)));
 	}
 
@@ -602,7 +598,7 @@ public class KeywordBase implements Constants {
 	 * @param locator
 	 *            HTML element locator from Object Repository file.
 	 */
-	public static void waitForElementInvisible(final String locator) {
+	public synchronized void waitForElementInvisible(final String locator) {
 		wait.until(ExpectedConditions
 				.invisibilityOfElementLocated(getElementBy(locator)));
 	}
@@ -612,7 +608,7 @@ public class KeywordBase implements Constants {
 	 * @param s
 	 * @return
 	 */
-	private static String[] splitValueMsg(String s) {
+	private synchronized String[] splitValueMsg(String s) {
 		String[] m = s.split("\\|");
 		return m;
 	}
@@ -630,7 +626,8 @@ public class KeywordBase implements Constants {
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
 	 */
-	public static void assertText(String locator, String text, String... index) {
+	public synchronized void assertText(String locator, String text,
+			String... index) {
 		log.info("Assert by Text " + locator + " text " + text);
 
 		if (splitValueMsg(getString(text)).length == 1)
@@ -655,7 +652,8 @@ public class KeywordBase implements Constants {
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
 	 */
-	public static void asserValue(String locator, String value, String... index) {
+	public synchronized void asserValue(String locator, String value,
+			String... index) {
 		log.info("Assert by value " + locator + " value " + value);
 
 		if (splitValueMsg(value).length == 1)
@@ -674,14 +672,14 @@ public class KeywordBase implements Constants {
 	 * @param title
 	 *            Expected title of the page
 	 */
-	public static void assertTitle(String title) {
+	public synchronized void assertTitle(String title) {
 		log.info("Assert by title " + title);
 
 		if (splitValueMsg(title).length == 1)
-			Assert.assertEquals(d.getTitle(),
+			Assert.assertEquals(driver().getTitle(),
 					getString(splitValueMsg(title)[0]));
 		else
-			Assert.assertEquals(d.getTitle(),
+			Assert.assertEquals(driver().getTitle(),
 					getString(splitValueMsg(title)[0]), splitValueMsg(title)[1]);
 
 	}
@@ -699,7 +697,7 @@ public class KeywordBase implements Constants {
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
 	 */
-	public static void assertElementPresent(String locator, String bool,
+	public synchronized void assertElementPresent(String locator, String bool,
 			String... index) {
 		log.info("Assert by element " + locator + " bool " + bool);
 
@@ -725,8 +723,8 @@ public class KeywordBase implements Constants {
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
 	 */
-	public static void assertCheckBoxSelected(String locator, String bool,
-			String... index) {
+	public synchronized void assertCheckBoxSelected(String locator,
+			String bool, String... index) {
 		log.info("Assert by element checked" + locator + " boolean " + bool);
 
 		if (splitValueMsg(bool).length == 1)
@@ -752,8 +750,8 @@ public class KeywordBase implements Constants {
 	 *            (Optional) Index of an element. Applies only if more than 1
 	 *            element present in HTML. 0 by default.
 	 */
-	public static void assertSelectedOption(String locator, String option,
-			String... index) {
+	public synchronized void assertSelectedOption(String locator,
+			String option, String... index) {
 		log.info("Assert by SelectedOption " + locator + " option " + option);
 
 		if (splitValueMsg(option).length == 1) {

@@ -40,7 +40,7 @@ public class MyTestContext {
 	static Parameters p = new Parameters();
 	static ThreadLocal<LinkedHashMap<String, String>> testStats = new ThreadLocal<LinkedHashMap<String, String>>();
 	static ThreadLocal<StringBuilder> messages = new ThreadLocal<StringBuilder>();
-	private static ArrayList<String> step;
+	private static ThreadLocal<ArrayList<String>> step = new ThreadLocal<ArrayList<String>>();
 	static ReadExcelData excelData;
 
 	public static void setMessage(String s) {
@@ -293,7 +293,7 @@ public class MyTestContext {
 	 * @return
 	 */
 	public static ArrayList<String> getStep() {
-		return step;
+		return step.get();
 	}
 
 	/**
@@ -302,8 +302,7 @@ public class MyTestContext {
 	 * @param s
 	 */
 	public static void setStep(ArrayList<String> s) {
-		step = new ArrayList<String>();
-		step = s;
+		step.set(s);
 	}
 
 }

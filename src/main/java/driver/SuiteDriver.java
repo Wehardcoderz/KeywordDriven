@@ -64,9 +64,11 @@ public class SuiteDriver implements Constants {
 		suite.setTests(tests);
 		List<XmlSuite> suites = new ArrayList<XmlSuite>();
 		suites.add(suite);
-		TestListenerAdapter tla = new TestListenerAdapter();
+		//TestListenerAdapter tla = new TestListenerAdapter();
+		List<Class> lis = new ArrayList<Class>();
+		lis.add(common.MyListener.class);
+		tng.setListenerClasses(lis);
 		tng.setXmlSuites(suites);
-		tng.addListener(tla);
 		tng.run();
 
 	}

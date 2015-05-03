@@ -18,26 +18,31 @@
  *******************************************************************************/
 package driver;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.apache.log4j.Logger;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
+import common.IDriver;
 import common.MyTestContext;
-import common.WebdriverManager;
+import common.Parameters;
 
 /**
  * 
  * @author Vishshady
  *
  */
-@Listeners(common.MyListener.class)
-public class TestDriver {
+public class TestDriver implements IDriver {
 	private static Logger log = Logger.getLogger(TestDriver.class);
-
+	RemoteWebDriver driver;
+	Parameters p = new Parameters();
 	public String d;
 	public String t;
 	public String e;
@@ -54,19 +59,27 @@ public class TestDriver {
 		return MyTestContext.prepareData();
 	}
 
-	// @AfterClass(alwaysRun = true)
+	@BeforeMethod(alwaysRun = true)
+	public void setUp() {
+		startDriver(p.getBrowsers());
+		loadHomePage();
+	}
+
 	@AfterMethod(alwaysRun = true)
 	public void tearDown() {
 		log.info("Stopping " + t);
-		WebdriverManager.stopDriver();
+		stopDriver();
 	}
 
 	@Test()
-	public void test() {
+	public void test() throws InstantiationException, IllegalAccessException,
+			IllegalArgumentException, ReflectiveOperationException,
+			NoSuchMethodException, SecurityException {
 		MyTestContext.setTestStats(t, d);
 		if (e.equalsIgnoreCase("False"))
 			throw new SkipException("Skipping this test as Enables == False");
-		new KeywordLauncher(t, d);
+		KeywordLauncher key = new KeywordLauncher(t, d, p);
+		key.set();
 	}
 
 }

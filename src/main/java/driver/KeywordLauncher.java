@@ -1,5 +1,7 @@
 package driver;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -8,39 +10,48 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
 
 import common.Constants;
+import common.IDriver;
 import common.KeywordBase;
 import common.MyTestContext;
 import common.Parameters;
 import common.ReadExcelData;
 import common.VariableStorage;
-import common.WebdriverManager;
 
-public class KeywordLauncher implements Constants {
+public class KeywordLauncher implements Constants, IDriver {
 	private static Logger log = Logger.getLogger(KeywordLauncher.class);
 	public static String keyword;
 	public static String target;
 	public static String value;
 	public static String index;
 	ReadExcelData excelData;
-	Parameters p = new Parameters();
 	HashMap<Integer, ArrayList<String>> keyset;
-	static KeywordBase keyWordBase;
+	// public static KeywordBase keyWordBase;
+	KeywordBase keyWordBase = null;
 	public static Method methods[];
+	String t;
+	String d;
+	Parameters p;
 
-	KeywordLauncher(String t, String d) {
-		set(t, d);
+	KeywordLauncher(String t, String d, Parameters p) {
+		this.t = t;
+		this.d = d;
+		this.p = p;
 	}
 
-	public void set(String t, String d) {
+	public void set() throws InstantiationException, IllegalAccessException,
+			IllegalArgumentException, InvocationTargetException,
+			NoSuchMethodException, SecurityException {
 		excelData = new ReadExcelData(p, t);
 		keyset = new HashMap<Integer, ArrayList<String>>();
 		keyset = excelData.getAllValues();
 		log.info("Setting up browser : " + p.getBrowsers() + " " + t);
-		WebdriverManager.setupDriver(p.getBrowsers());
-		keyWordBase = new KeywordBase(p);
+
+		keyWordBase = KeywordBase.class.getConstructor(Parameters.class).newInstance(p);
+
 		methods = keyWordBase.getClass().getMethods();
 
 		log.info("Now Executing : " + t + " Test Description : " + d);
@@ -72,7 +83,7 @@ public class KeywordLauncher implements Constants {
 
 	}
 
-	private static void execute() {
+	private void execute() {
 
 		for (int i = 0; i < methods.length; i++) {
 			if (methods[i].getName().equals(keyword)) {
@@ -84,7 +95,7 @@ public class KeywordLauncher implements Constants {
 		}
 	}
 
-	public static void executeIndexNull(int i) {
+	public void executeIndexNull(int i) {
 		try {
 			String[] index = new String[0];
 			if (target != null && value != null) {
@@ -105,16 +116,28 @@ public class KeywordLauncher implements Constants {
 				Assert.fail("Empty target and values");
 			}
 		} catch (IllegalAccessException e) {
+			StringWriter s = new StringWriter();
+			PrintWriter p = new PrintWriter(s, true);
+			e.printStackTrace(p);
+			log.error(s.getBuffer().toString());
 			Assert.fail("1. Check test case step for errors");
 			keyword = null;
 			target = null;
 			value = null;
 		} catch (IllegalArgumentException e) {
+			StringWriter s = new StringWriter();
+			PrintWriter p = new PrintWriter(s, true);
+			e.printStackTrace(p);
+			log.error(s.getBuffer().toString());
 			Assert.fail("1. Check test case step for errors 2. Make sure valid keyword and arguments are passed");
 			keyword = null;
 			target = null;
 			value = null;
 		} catch (InvocationTargetException e) {
+			StringWriter s = new StringWriter();
+			PrintWriter p = new PrintWriter(s, true);
+			e.printStackTrace(p);
+			log.error(s.getBuffer().toString());
 			Assert.fail("1. Check test case step for errors 2. Verify the behavior of the application manually");
 			keyword = null;
 			target = null;
@@ -122,7 +145,7 @@ public class KeywordLauncher implements Constants {
 		}
 	}
 
-	public static void executeIndex(int i, int index) {
+	public void executeIndex(int i, int index) {
 		try {
 			if (target != null && value != null) {
 				methods[i].invoke(keyWordBase, target, value, index);
@@ -136,16 +159,28 @@ public class KeywordLauncher implements Constants {
 				Assert.fail("Empty target and values");
 			}
 		} catch (IllegalAccessException e) {
+			StringWriter s = new StringWriter();
+			PrintWriter p = new PrintWriter(s, true);
+			e.printStackTrace(p);
+			log.error(s.getBuffer().toString());
 			Assert.fail("1. Check test case step for errors");
 			keyword = null;
 			target = null;
 			value = null;
 		} catch (IllegalArgumentException e) {
+			StringWriter s = new StringWriter();
+			PrintWriter p = new PrintWriter(s, true);
+			e.printStackTrace(p);
+			log.error(s.getBuffer().toString());
 			Assert.fail("1. Check test case step for errors 2. Make sure valid keyword and arguments are passed");
 			keyword = null;
 			target = null;
 			value = null;
 		} catch (InvocationTargetException e) {
+			StringWriter s = new StringWriter();
+			PrintWriter p = new PrintWriter(s, true);
+			e.printStackTrace(p);
+			log.error(s.getBuffer().toString());
 			Assert.fail("1. Check test case step for errors 2. Verify the behavior of the application manually");
 			keyword = null;
 			target = null;

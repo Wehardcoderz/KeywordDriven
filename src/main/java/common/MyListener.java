@@ -44,7 +44,7 @@ import org.testng.TestListenerAdapter;
  * @author Vishshady
  *
  */
-public class MyListener extends TestListenerAdapter {
+public class MyListener extends TestListenerAdapter implements IDriver {
 	private static Logger log = Logger.getLogger(MyListener.class);
 	Parameters p = new Parameters();
 	LinkedHashMap<String, Object[]> testPassed;
@@ -84,7 +84,7 @@ public class MyListener extends TestListenerAdapter {
 	}
 
 	@Override
-	public void onTestFailure(ITestResult tr) {
+	public synchronized void onTestFailure(ITestResult tr) {
 		try {
 			time = tr.getEndMillis() - tr.getStartMillis();
 			time = time / 1000;
@@ -107,8 +107,7 @@ public class MyListener extends TestListenerAdapter {
 			}
 			addTestLogs(t);
 			MyTestContext.testStats.remove();
-			WebDriver driver = new Augmenter().augment(WebdriverManager
-					.getDriverInstance());
+			WebDriver driver = new Augmenter().augment(driver());
 			File scrFile = ((TakesScreenshot) driver)
 					.getScreenshotAs(OutputType.FILE);
 			String destDir = "screenshots";
