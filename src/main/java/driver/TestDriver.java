@@ -18,16 +18,12 @@
  *******************************************************************************/
 package driver;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Factory;
-import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import common.IDriver;
@@ -59,12 +55,6 @@ public class TestDriver implements IDriver {
 		return MyTestContext.prepareData();
 	}
 
-	@BeforeMethod(alwaysRun = true)
-	public void setUp() {
-		startDriver(p.getBrowsers());
-		loadHomePage();
-	}
-
 	@AfterMethod(alwaysRun = true)
 	public void tearDown() {
 		log.info("Stopping " + t);
@@ -78,6 +68,9 @@ public class TestDriver implements IDriver {
 		MyTestContext.setTestStats(t, d);
 		if (e.equalsIgnoreCase("False"))
 			throw new SkipException("Skipping this test as Enables == False");
+
+		startDriver(p.getBrowsers());
+		loadHomePage();
 		KeywordLauncher key = new KeywordLauncher(t, d, p);
 		key.set();
 	}
