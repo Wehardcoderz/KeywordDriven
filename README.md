@@ -1,5 +1,6 @@
 Selenword : Keydriven framework using selenium
 ----------------------------------------------
+[![Sauce Test Status](https://saucelabs.com/buildstatus/Vishshady)](https://saucelabs.com/u/Vishshady)
 
 Selenword is divided into three parts :
 
